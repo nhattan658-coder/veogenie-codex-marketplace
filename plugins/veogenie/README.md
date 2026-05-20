@@ -105,6 +105,27 @@ plugins/veogenie
 
 Point Codex Source to that folder, or copy that folder to a separate public repository. The default metadata is valid for local testing; before publishing, replace the `example.com` URLs and contact details in `.codex-plugin/plugin.json` with real publisher, repository, privacy, and terms URLs.
 
+Verified marketplace URL:
+
+```text
+https://github.com/nhattan658-coder/veogenie-codex-marketplace.git
+```
+
+For Codex "Add marketplace", use:
+
+```text
+Source: https://github.com/nhattan658-coder/veogenie-codex-marketplace.git
+Git ref: main
+Sparse paths: leave empty
+```
+
+If the marketplace appears but the VeoGenie plugin is not listed for install, enable it in `C:\Users\Admin\.codex\config.toml` and restart Codex:
+
+```toml
+[plugins."veogenie@veogenie-marketplace"]
+enabled = true
+```
+
 See `PUBLICATION_CHECKLIST.md` for the full release checklist.
 
 ## Test Prompt

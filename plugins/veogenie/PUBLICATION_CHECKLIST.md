@@ -61,6 +61,21 @@ dist/codex-marketplace
 
 This folder contains `.agents/plugins/marketplace.json` plus `plugins/veogenie`, and does not contain the desktop app source.
 
+If publishing via GitHub, push the standalone marketplace root so Codex can add the repo with:
+
+```text
+Source: https://github.com/<owner>/veogenie-codex-marketplace.git
+Git ref: main
+Sparse paths: leave empty
+```
+
+After adding the marketplace, verify the plugin is enabled. If the UI does not expose an install button, document the fallback:
+
+```toml
+[plugins."veogenie@veogenie-marketplace"]
+enabled = true
+```
+
 ## Default Safety
 
 - Keep `.mcp.json` read-only by default.
