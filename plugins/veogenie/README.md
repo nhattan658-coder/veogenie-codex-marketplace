@@ -49,7 +49,29 @@ The default `.mcp.json` is read-only. It lets Codex call tools such as:
 
 ## Optional Guards
 
-Only add these environment variables when you intentionally want Codex to perform the corresponding action:
+The default plugin remains read-only. For normal Codex chat usage, prefer temporary session permissions instead of asking the user to set PowerShell environment variables.
+
+When the user explicitly approves an action in chat, Codex can call:
+
+```json
+{
+  "permissions": ["canvas_write", "media_import", "actions"],
+  "confirmGrantSessionPermissions": true,
+  "approvalNote": "User approved creating a page, importing one local product image, and running image nodes."
+}
+```
+
+with `grant_mcp_session_permissions`. Session permissions only apply to the current MCP server process, expire automatically, and disappear when Codex/plugin restarts. `run_workflow_payload` cannot be enabled this way and still requires `VEOGENIE_MCP_ALLOW_RUN=1`.
+
+Available session permissions:
+
+- `canvas_write`
+- `media_import`
+- `actions`
+- `media_export`
+- `project_export`
+
+For persistent admin-managed access, add these environment variables only when you intentionally want Codex to perform the corresponding action:
 
 ```json
 {

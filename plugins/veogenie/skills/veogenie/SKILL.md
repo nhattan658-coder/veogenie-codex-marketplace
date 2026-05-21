@@ -1,6 +1,6 @@
 ---
 name: veogenie
-description: Use when Codex needs to inspect or control a locally installed VeoGenie desktop app through the bundled MCP server. Start with read-only status/page/workflow tools; only use guarded write/run/export tools when the user explicitly enabled the corresponding environment guard.
+description: Use when Codex needs to inspect or control a locally installed VeoGenie desktop app through the bundled MCP server. Start with read-only status/page/workflow tools; only use guarded write/run/export tools when the user explicitly enabled the corresponding environment guard or granted temporary MCP session permission in chat.
 ---
 
 # VeoGenie
@@ -24,14 +24,15 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 
 ## Guarded Tools
 
-- `run_node` and `run_group` require `VEOGENIE_MCP_ALLOW_ACTIONS=1`.
-- `create_workflow_page`, `append_workflow_to_current_page`, and `undo_last_mcp_canvas_write` require `VEOGENIE_MCP_ALLOW_CANVAS_WRITE=1` plus the tool-specific confirm fields.
-- `export_media` requires `VEOGENIE_MCP_ALLOW_MEDIA_EXPORT=1` and `confirmOpenSaveDialog=true`.
-- `attach_local_media_to_node` requires `VEOGENIE_MCP_ALLOW_MEDIA_IMPORT=1` and `confirmImportLocalFile=true`.
-- `export_media_to_workspace` requires `VEOGENIE_MCP_ALLOW_PROJECT_EXPORT=1`, `confirmWriteProjectRender=true`, and an absolute `workspaceRoot`; it only writes generated media into `<workspaceRoot>/render/`.
+- If the user explicitly approves permissions in chat, call `grant_mcp_session_permissions` with the needed permissions and `confirmGrantSessionPermissions=true`. This avoids asking the user to set PowerShell env vars.
+- `run_node` and `run_group` require `VEOGENIE_MCP_ALLOW_ACTIONS=1` or session permission `actions`.
+- `create_workflow_page`, `append_workflow_to_current_page`, and `undo_last_mcp_canvas_write` require `VEOGENIE_MCP_ALLOW_CANVAS_WRITE=1` or session permission `canvas_write`, plus the tool-specific confirm fields.
+- `export_media` requires `VEOGENIE_MCP_ALLOW_MEDIA_EXPORT=1` or session permission `media_export`, plus `confirmOpenSaveDialog=true`.
+- `attach_local_media_to_node` requires `VEOGENIE_MCP_ALLOW_MEDIA_IMPORT=1` or session permission `media_import`, plus `confirmImportLocalFile=true`.
+- `export_media_to_workspace` requires `VEOGENIE_MCP_ALLOW_PROJECT_EXPORT=1` or session permission `project_export`, plus `confirmWriteProjectRender=true` and an absolute `workspaceRoot`; it only writes generated media into `<workspaceRoot>/render/`.
 - `run_workflow_payload` requires `VEOGENIE_MCP_ALLOW_RUN=1`.
 
-Do not use guarded tools unless the user explicitly asked for that action and the relevant guard is enabled.
+Do not use guarded tools unless the user explicitly asked for that action and the relevant env guard or session permission is enabled. Use `revoke_mcp_session_permissions` when the user asks to turn off temporary permissions.
 
 For node/group runs, do not call `run_workflow_payload`; use `run_node` / `run_group`, then poll `get_run_orchestration_status`. Do not submit another run while the command is `queued` / `dispatched` or the output is `running`.
 

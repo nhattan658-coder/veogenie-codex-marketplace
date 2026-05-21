@@ -94,6 +94,8 @@ enabled = true
 
 - Keep `.mcp.json` read-only by default.
 - Do not enable `VEOGENIE_MCP_ALLOW_ACTIONS`, `VEOGENIE_MCP_ALLOW_CANVAS_WRITE`, `VEOGENIE_MCP_ALLOW_MEDIA_EXPORT`, `VEOGENIE_MCP_ALLOW_MEDIA_IMPORT`, `VEOGENIE_MCP_ALLOW_PROJECT_EXPORT`, or `VEOGENIE_MCP_ALLOW_RUN` by default.
+- `grant_mcp_session_permissions` may be available, but it must only grant temporary permissions after the user explicitly approves the action in chat.
+- Keep `run_workflow_payload` env-only via `VEOGENIE_MCP_ALLOW_RUN=1`; do not allow session grants for raw workflow payloads.
 - Document guarded tools as opt-in only.
 - Do not include source app code, license issuer/private key, admin routes, media payloads, or customer data in the public plugin repository.
 
