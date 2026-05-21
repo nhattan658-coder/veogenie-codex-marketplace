@@ -49,6 +49,13 @@ TERMS.md
 LICENSE.md
 ```
 
+Agent instruction files must also be present before export:
+
+```text
+AGENTS.md
+CLAUDE.md
+```
+
 `npm run plugin:export` rejects plugin metadata if any public plugin metadata file still contains local-test URLs.
 
 ## Plugin Export
@@ -74,6 +81,7 @@ dist/codex-marketplace
 ```
 
 This folder contains `.agents/plugins/marketplace.json` plus `plugins/veogenie`, and does not contain the desktop app source.
+It also includes root-level `AGENTS.md` and `CLAUDE.md` so Codex and Claude can read the exact MCP run/export workflow before using the plugin.
 
 If publishing via GitHub, push the standalone marketplace root so Codex can add the repo with:
 

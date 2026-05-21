@@ -125,7 +125,18 @@ Do not enable all guards by default.
 
 VeoGenie results must be reported from the app state, not from a new image generated in Codex chat. After running a node or group, Codex should read `get_node_outputs`, then call `get_media_album` with the exact output `nodeId`, `source="generated"`, and the expected media `type`.
 
-If the user wants files back in the project, Codex should export each verified `mediaId` with `export_media_to_workspace` after `project_export` is enabled, then report the exported file paths. MCP intentionally does not return media URLs/base64, so Codex should not display a separate generated preview as the VeoGenie output.
+If the user wants files back in the project, Codex should export each verified `mediaId` with `export_media_to_workspace` after `project_export` is enabled, then report the exported file paths. MCP intentionally does not return media URLs or raw media payloads, so Codex should not display a separate generated preview as the VeoGenie output.
+
+## Agent Instructions
+
+This marketplace also includes repo-level instructions for agents:
+
+```text
+AGENTS.md
+CLAUDE.md
+```
+
+These files define the exact run/poll/album/export sequence for Codex, Claude, and other repo-aware agents. They are exported to the marketplace root and also kept inside `plugins/veogenie`.
 
 ## Export From App Repo
 
@@ -153,7 +164,24 @@ That folder contains only:
 
 ```text
 .agents/plugins/marketplace.json
+AGENTS.md
+CLAUDE.md
 plugins/veogenie
+```
+
+The plugin folder contains:
+
+```text
+.codex-plugin/plugin.json
+.mcp.json
+AGENTS.md
+CLAUDE.md
+README.md
+PUBLICATION_CHECKLIST.md
+PRIVACY.md
+TERMS.md
+LICENSE.md
+skills/veogenie/SKILL.md
 ```
 
 Point Codex Source to that folder, or copy that folder to a separate public repository. The plugin metadata now points to the verified public marketplace repository and local policy files:

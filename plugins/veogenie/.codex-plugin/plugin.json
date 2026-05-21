@@ -1,6 +1,6 @@
 {
   "name": "veogenie",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Connect Codex to the locally installed VeoGenie desktop app through MCP.",
   "author": {
     "name": "VeoGenie",
