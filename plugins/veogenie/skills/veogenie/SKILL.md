@@ -22,6 +22,14 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 7. Use `plan_product_ad_job` for an end-to-end product ad tool-call plan; it is read-only and does not execute the plan.
 8. After a guarded `run_node` or `run_group`, use `get_run_orchestration_status` with the returned command id before deciding whether to poll again or read final outputs.
 
+## Result Handoff
+
+- Treat the VeoGenie desktop app as the source of truth. Do not generate, redraw, attach, or display a separate AI image in chat as if it were a VeoGenie result.
+- After a run finishes, call `get_node_outputs` and then `get_media_album` with the exact output `nodeId`, `source="generated"`, and the expected `type`.
+- Compare the returned media count with the node `resultCount` or `assetHistory` count before saying the job is complete.
+- If the user wants the actual files outside the app, use `export_media_to_workspace` for each `mediaId` from `get_media_album` after `project_export` is enabled. Report the exported paths/media ids, not a new chat-generated preview.
+- If the media cannot be verified or exported, say that directly and leave the result in the VeoGenie app.
+
 ## Guarded Tools
 
 - If the user explicitly approves permissions in chat, call `grant_mcp_session_permissions` with the needed permissions and `confirmGrantSessionPermissions=true`. This avoids asking the user to set PowerShell env vars.

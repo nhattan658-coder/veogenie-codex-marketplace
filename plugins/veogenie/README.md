@@ -121,6 +121,12 @@ Do not enable all guards by default.
 
 `VEOGENIE_MCP_ALLOW_PROJECT_EXPORT=1` enables `export_media_to_workspace`, which writes generated media into `<workspaceRoot>/render/`. The tool still requires `confirmWriteProjectRender=true`, an absolute `workspaceRoot`, and a media id from `get_media_album`; it does not accept media URLs/base64 through MCP and does not overwrite existing files unless `confirmOverwrite=true`.
 
+## Reporting Results
+
+VeoGenie results must be reported from the app state, not from a new image generated in Codex chat. After running a node or group, Codex should read `get_node_outputs`, then call `get_media_album` with the exact output `nodeId`, `source="generated"`, and the expected media `type`.
+
+If the user wants files back in the project, Codex should export each verified `mediaId` with `export_media_to_workspace` after `project_export` is enabled, then report the exported file paths. MCP intentionally does not return media URLs/base64, so Codex should not display a separate generated preview as the VeoGenie output.
+
 ## Export From App Repo
 
 When this plugin lives inside the app repo, export a clean public-copy folder with:
