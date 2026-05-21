@@ -17,7 +17,7 @@ Invoke-RestMethod http://127.0.0.1:8788/health
 
 ## Plugin Metadata
 
-Replace the local-test metadata in:
+Verify the public metadata in:
 
 ```text
 .codex-plugin/plugin.json
@@ -35,7 +35,21 @@ Required values:
 - privacy policy URL
 - terms of service URL
 
-Do not publish the default `example.com` URLs.
+The current public target is:
+
+```text
+https://github.com/nhattan658-coder/veogenie-codex-marketplace
+```
+
+The policy/license files must be present before export:
+
+```text
+PRIVACY.md
+TERMS.md
+LICENSE.md
+```
+
+`npm run plugin:export` rejects plugin metadata if any public plugin metadata file still contains local-test URLs.
 
 ## Plugin Export
 
@@ -79,7 +93,7 @@ enabled = true
 ## Default Safety
 
 - Keep `.mcp.json` read-only by default.
-- Do not enable `VEOGENIE_MCP_ALLOW_ACTIONS`, `VEOGENIE_MCP_ALLOW_CANVAS_WRITE`, `VEOGENIE_MCP_ALLOW_MEDIA_EXPORT`, or `VEOGENIE_MCP_ALLOW_RUN` by default.
+- Do not enable `VEOGENIE_MCP_ALLOW_ACTIONS`, `VEOGENIE_MCP_ALLOW_CANVAS_WRITE`, `VEOGENIE_MCP_ALLOW_MEDIA_EXPORT`, `VEOGENIE_MCP_ALLOW_MEDIA_IMPORT`, `VEOGENIE_MCP_ALLOW_PROJECT_EXPORT`, or `VEOGENIE_MCP_ALLOW_RUN` by default.
 - Document guarded tools as opt-in only.
 - Do not include source app code, license issuer/private key, admin routes, media payloads, or customer data in the public plugin repository.
 
@@ -89,5 +103,7 @@ With the app open, ask Codex:
 
 ```text
 Use the VeoGenie MCP plugin to call get_mcp_capabilities, get_app_status, list_pages, and get_current_workflow.
-Do not run Google Flow, ChatGPT, GPT Image 2, run_node, run_group, or run_workflow_payload.
+Optionally call build_product_ad_workflow_recipe with a sample product brief and confirm it only returns a recipe.
+Optionally call get_run_orchestration_status with a known nodeId only after confirming it is read-only and does not queue a run.
+Do not run Google Flow, ChatGPT, GPT Image 2, create/append pages, import media, export files, run_node, run_group, or run_workflow_payload.
 ```

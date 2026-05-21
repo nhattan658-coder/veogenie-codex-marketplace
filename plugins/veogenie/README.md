@@ -42,7 +42,10 @@ The default `.mcp.json` is read-only. It lets Codex call tools such as:
 - `get_current_workflow`
 - `get_node_outputs`
 - `get_media_album`
+- `build_product_ad_workflow_recipe`
+- `plan_product_ad_job`
 - `get_command_status`
+- `get_run_orchestration_status`
 
 ## Optional Guards
 
@@ -68,11 +71,33 @@ Only add these environment variables when you intentionally want Codex to perfor
 
 ```json
 {
+  "VEOGENIE_MCP_ALLOW_MEDIA_IMPORT": "1"
+}
+```
+
+```json
+{
+  "VEOGENIE_MCP_ALLOW_PROJECT_EXPORT": "1"
+}
+```
+
+```json
+{
   "VEOGENIE_MCP_ALLOW_RUN": "1"
 }
 ```
 
 Do not enable all guards by default.
+
+`build_product_ad_workflow_recipe` is read-only. It only returns a suggested workflow recipe and next steps for a product ad job; it does not modify the canvas, import media, run automation, or export files.
+
+`plan_product_ad_job` is read-only. It returns an end-to-end tool-call plan for a product ad job, including the recipe, node ids, required guards, polling rules, and optional render export steps; it does not execute those steps.
+
+`get_run_orchestration_status` is read-only. Use it after a guarded `run_node` or `run_group` call to check command ack and sanitized output status before deciding whether to poll again.
+
+`VEOGENIE_MCP_ALLOW_MEDIA_IMPORT=1` enables `attach_local_media_to_node`, which reads a local image path through the desktop app and attaches it to an existing `imageReference` node. The tool still requires `confirmImportLocalFile=true` and does not return media bytes/base64 through MCP.
+
+`VEOGENIE_MCP_ALLOW_PROJECT_EXPORT=1` enables `export_media_to_workspace`, which writes generated media into `<workspaceRoot>/render/`. The tool still requires `confirmWriteProjectRender=true`, an absolute `workspaceRoot`, and a media id from `get_media_album`; it does not accept media URLs/base64 through MCP and does not overwrite existing files unless `confirmOverwrite=true`.
 
 ## Export From App Repo
 
@@ -103,7 +128,13 @@ That folder contains only:
 plugins/veogenie
 ```
 
-Point Codex Source to that folder, or copy that folder to a separate public repository. The default metadata is valid for local testing; before publishing, replace the `example.com` URLs and contact details in `.codex-plugin/plugin.json` with real publisher, repository, privacy, and terms URLs.
+Point Codex Source to that folder, or copy that folder to a separate public repository. The plugin metadata now points to the verified public marketplace repository and local policy files:
+
+```text
+plugins/veogenie/PRIVACY.md
+plugins/veogenie/TERMS.md
+plugins/veogenie/LICENSE.md
+```
 
 Verified marketplace URL:
 
@@ -136,5 +167,6 @@ Use the VeoGenie MCP plugin to check the open desktop app:
 2. Call get_app_status.
 3. Call list_pages.
 4. Call get_current_workflow and report the active page node/edge count.
-Do not run Google Flow, ChatGPT, GPT Image 2, run_node, run_group, or run_workflow_payload.
+5. Optionally call build_product_ad_workflow_recipe for a sample product brief and confirm it only returns a recipe.
+Do not run Google Flow, ChatGPT, GPT Image 2, create/append pages, import media, export files, run_node, run_group, or run_workflow_payload.
 ```

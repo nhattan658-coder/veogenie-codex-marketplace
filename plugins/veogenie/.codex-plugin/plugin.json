@@ -4,11 +4,11 @@
   "description": "Connect Codex to the locally installed VeoGenie desktop app through MCP.",
   "author": {
     "name": "VeoGenie",
-    "email": "support@example.com",
-    "url": "https://example.com/veogenie"
+    "email": "nhattan658-coder@users.noreply.github.com",
+    "url": "https://github.com/nhattan658-coder/veogenie-codex-marketplace"
   },
-  "homepage": "https://example.com/veogenie/docs",
-  "repository": "https://example.com/veogenie/codex-plugin",
+  "homepage": "https://github.com/nhattan658-coder/veogenie-codex-marketplace#readme",
+  "repository": "https://github.com/nhattan658-coder/veogenie-codex-marketplace",
   "license": "Proprietary",
   "keywords": ["veogenie", "mcp", "codex", "desktop", "workflow"],
   "skills": "./skills/",
@@ -20,9 +20,9 @@
     "developerName": "VeoGenie",
     "category": "Productivity",
     "capabilities": ["Interactive", "Read"],
-    "websiteURL": "https://example.com/veogenie",
-    "privacyPolicyURL": "https://example.com/veogenie/privacy",
-    "termsOfServiceURL": "https://example.com/veogenie/terms",
+    "websiteURL": "https://github.com/nhattan658-coder/veogenie-codex-marketplace",
+    "privacyPolicyURL": "https://github.com/nhattan658-coder/veogenie-codex-marketplace/blob/main/plugins/veogenie/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/nhattan658-coder/veogenie-codex-marketplace/blob/main/plugins/veogenie/TERMS.md",
     "defaultPrompt": [
       "Check my open VeoGenie workflow.",
       "List VeoGenie pages and node counts.",
