@@ -2,6 +2,18 @@
 
 This plugin connects Codex to the locally installed VeoGenie desktop app through MCP.
 
+## Included Skills
+
+The plugin includes one core control skill and four creative/QA skills:
+
+- `veogenie`: safe MCP inspection, permissions, run/poll, result handoff, and export rules.
+- `veogenie-workflow-designer`: workflow node/edge planning, dependency checks, and recipe quality.
+- `veogenie-product-ad`: product image/video ad briefs, prompt standards, and product fidelity checks.
+- `veogenie-video-director`: video prompts, shot structure, camera motion, frames, duration, and voice guidance.
+- `veogenie-result-qa`: node-specific output verification, media count checks, and export handoff.
+
+Creative skills never enable guarded actions by themselves. They must still follow the `veogenie` core permission and result-handoff flow.
+
 ## Requirements
 
 1. Install VeoGenie Tool.
@@ -182,6 +194,10 @@ PRIVACY.md
 TERMS.md
 LICENSE.md
 skills/veogenie/SKILL.md
+skills/veogenie-workflow-designer/SKILL.md
+skills/veogenie-product-ad/SKILL.md
+skills/veogenie-video-director/SKILL.md
+skills/veogenie-result-qa/SKILL.md
 ```
 
 Point Codex Source to that folder, or copy that folder to a separate public repository. The plugin metadata now points to the verified public marketplace repository and local policy files:

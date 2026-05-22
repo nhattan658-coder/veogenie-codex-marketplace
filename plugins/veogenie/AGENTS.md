@@ -20,6 +20,15 @@ Always start with read-only tools:
 
 Do not call `run_node`, `run_group`, canvas-write tools, import, or export during a read-only check.
 
+## Skill Selection
+
+- Use `veogenie` for MCP safety, read-only inspection, permissions, run/poll, result handoff, and export rules.
+- Use `veogenie-workflow-designer` for workflow node/edge planning and dependency checks.
+- Use `veogenie-product-ad` for product image/video ad briefs, prompt standards, and product fidelity.
+- Use `veogenie-video-director` for video prompts, camera motion, frame planning, duration, and voice guidance.
+- Use `veogenie-result-qa` before reporting completion or exporting generated media.
+- Creative skills are guidance only; they do not enable MCP write/run/export guards.
+
 ## Permissions
 
 Prefer session permissions when the user explicitly approves actions in chat:

@@ -56,6 +56,18 @@ AGENTS.md
 CLAUDE.md
 ```
 
+## Skill Pack
+
+Verify the plugin includes the default VeoGenie skill pack:
+
+- `skills/veogenie/SKILL.md`
+- `skills/veogenie-workflow-designer/SKILL.md`
+- `skills/veogenie-product-ad/SKILL.md`
+- `skills/veogenie-video-director/SKILL.md`
+- `skills/veogenie-result-qa/SKILL.md`
+
+Each skill must have YAML frontmatter with only `name` and `description`. Creative skills are guidance only; they must not enable MCP write/run/export guards or bypass app-verified result handoff.
+
 `npm run plugin:export` rejects plugin metadata if any public plugin metadata file still contains local-test URLs.
 
 ## Plugin Export

@@ -11,6 +11,13 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 - The local backend should answer `http://127.0.0.1:8788/health`.
 - The installed MCP launcher should exist at `D:\VeoGenie Tool\veogenie-mcp.cmd`.
 
+## Companion Skills
+
+- Use `veogenie-workflow-designer` when the task is to design, inspect, or improve workflow node structure.
+- Use `veogenie-product-ad` when the task is product images, product videos, social ads, ecommerce visuals, or campaign variants.
+- Use `veogenie-video-director` when the task is video prompt direction, storyboard, camera movement, frame planning, or voice guidance.
+- Use `veogenie-result-qa` when the task is to verify generated media, compare results with a brief, or export verified app media.
+
 ## Default Safe Flow
 
 1. Call `get_mcp_capabilities`.

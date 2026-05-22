@@ -16,6 +16,10 @@ The VeoGenie desktop app is authoritative. Claude must not generate or display a
 6. Export with `export_media_to_workspace` only using `mediaId` values returned by that album query.
 7. Poll `get_command_status` for each export command.
 
+## Creative Skill Use
+
+Use the plugin skill pack when available: `veogenie-workflow-designer` for workflow shape, `veogenie-product-ad` for product ads, `veogenie-video-director` for video direction, and `veogenie-result-qa` for final verification. These skills do not override MCP permissions or app-verified result handoff.
+
 ## Export Discipline
 
 - Pass `pageId` from the album item when available.

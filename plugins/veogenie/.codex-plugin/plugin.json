@@ -1,7 +1,7 @@
 {
   "name": "veogenie",
-  "version": "0.1.1",
-  "description": "Connect Codex to the locally installed VeoGenie desktop app through MCP.",
+  "version": "0.1.2",
+  "description": "Connect Codex to the locally installed VeoGenie desktop app through MCP and workflow-quality skills.",
   "author": {
     "name": "VeoGenie",
     "email": "nhattan658-coder@users.noreply.github.com",
@@ -16,7 +16,7 @@
   "interface": {
     "displayName": "VeoGenie",
     "shortDescription": "Use the local VeoGenie desktop app from Codex.",
-    "longDescription": "Adds MCP tools that let Codex read and safely control the locally installed VeoGenie desktop app. The default configuration is read-only and connects through the app's installed veogenie-mcp.cmd launcher.",
+    "longDescription": "Adds MCP tools that let Codex read and safely control the locally installed VeoGenie desktop app, plus skills for designing higher-quality workflows, product ads, video direction, and result QA. The default configuration is read-only and connects through the app's installed veogenie-mcp.cmd launcher.",
     "developerName": "VeoGenie",
     "category": "Productivity",
     "capabilities": ["Interactive", "Read"],
@@ -26,7 +26,9 @@
     "defaultPrompt": [
       "Check my open VeoGenie workflow.",
       "List VeoGenie pages and node counts.",
-      "Read the current VeoGenie media album."
+      "Read the current VeoGenie media album.",
+      "Design a VeoGenie product ad workflow from my product brief.",
+      "Review whether my generated VeoGenie result is ready to export."
     ],
     "brandColor": "#22C55E"
   }
