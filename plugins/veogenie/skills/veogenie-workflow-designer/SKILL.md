@@ -1,50 +1,48 @@
 ---
 name: veogenie-workflow-designer
-description: Design, inspect, or improve VeoGenie workflows before creating or running them. Use when Codex needs to convert a creative brief into safe VeoGenie nodes and edges, choose image/video/assistant nodes, validate dependencies and handles, or review a workflow plan for quality without bypassing MCP guards.
+description: Design, review, or create VeoGenie workflow recipes with correct node types, edge handles, and MCP canvas-write sequencing. Use when Codex needs to build or append workflows, connect inputs to generate nodes, route text/image/video/voice outputs, or reason about video frame, reference image, and voice ports including video component-mode connections.
 ---
 
 # VeoGenie Workflow Designer
 
-## Scope
+## Start
 
-Use this skill to plan the workflow shape. Use the core `veogenie` skill for MCP calls, permissions, run/poll behavior, exports, and result handoff.
+Use this skill when the task involves workflow structure, nodes, edges, or handles.
 
-## Default Process
+Before creating or appending a workflow:
 
-1. Identify the user's final deliverable: image set, video, text prompt, product ad, campaign concept, or workflow review.
-2. Decide whether the task is plan-only or app-control. For app-control, start with the core `veogenie` read-only flow before proposing edits.
-3. Choose the smallest workflow that can produce the requested output.
-4. Validate every dependency before creating or running the workflow.
-5. Use guarded MCP write/run/export tools only when the user explicitly asks for that action and the core `veogenie` permission rules are satisfied.
+1. Use the base `veogenie` skill to read app state.
+2. Read `references/node-port-contract.md`.
+3. If a voice input is involved, read `references/voice-connection-rules.md`.
+4. If the user asks for a full workflow pattern, read `references/workflow-patterns.md`.
 
-## Node Contract
+## Recipe Rules
 
-- Use `textPrompt` for written direction and prompt text.
-- Use `imageReference` for uploaded or local reference images.
-- Use `aiAssistant` when a workflow needs reusable script, prompt rewrite, shot list, or structured copy before image/video generation.
-- Use `imageGenerate` for final or intermediate images.
-- Use `videoGenerate` only after required text and frame/reference image dependencies are ready.
-- Use `voiceReference` only for video voice guidance, following the current voice rules from the app.
-- Do not create, connect, or run `characterReference` / `Nhan Vat` while the app/MCP capabilities report it as disabled or locked.
+- Always set explicit `sourceHandle` and `targetHandle` on every recipe edge.
+- Do not rely on default handle inference when the target is `videoGenerate`.
+- Treat `frame-start`, `frame-end`, `video-reference-image`, and `video-voice-reference` as different semantics.
+- Do not pass media URLs, data URLs, blob URLs, or base64 through recipe nodes.
+- Create empty `imageReference` nodes in recipes, then use `attach_local_media_to_node` only after the page/node exists and media import permission is enabled.
 
-## Handle Rules
+## Canvas Write Flow
 
-- Connect text to text inputs only.
-- Connect product/reference images to image inputs only.
-- Connect video start and end frames to the dedicated frame handles, not to generic reference handles.
-- Connect additional video visual references to `video-reference-image`.
-- Connect voice input to `video-voice-reference`.
-- Never mix `character-reference` with image, frame, video-reference, or voice handles.
+For a new workflow page:
 
-## Recipe Standards
+1. Build a recipe with explicit handles.
+2. Use `create_workflow_page` only after `canvas_write` permission is enabled.
+3. Read `get_current_workflow` after the command is accepted.
+4. Verify the expected nodes and edges exist.
 
-- Keep node ids stable, lowercase, and readable.
-- Put the input/reference nodes on the left, generation nodes on the right, and assistant/planning nodes between them.
-- Prefer one clear text prompt per output branch.
-- Set `resultCount` deliberately: use `1` for validation, `2-4` for variant exploration.
-- Set aspect ratio from the user's delivery channel. Default to `9:16` for short-form ads unless the user asks otherwise.
-- Do not include media URLs, base64, blob URLs, or data URLs in workflow recipes.
+For the current page:
 
-## References
+1. Prefer a new page unless the user asked to modify the active page.
+2. Use `append_workflow_to_current_page` with `confirmModifyCurrentPage=true`.
+3. Keep the returned `rollbackToken`.
+4. Verify with `get_current_workflow`.
 
-Read `references/workflow-patterns.md` when choosing a workflow shape or checking dependency order.
+## Run Flow
+
+- Use `run_node` or `run_group` only after `actions` permission is enabled.
+- Poll `get_run_orchestration_status` with the returned `commandId`.
+- Do not call `run_node` again while the command is queued/dispatched or output is running.
+- After success, use the `veogenie-result-qa` skill for output verification and export.

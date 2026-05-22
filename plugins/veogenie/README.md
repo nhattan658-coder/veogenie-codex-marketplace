@@ -2,18 +2,6 @@
 
 This plugin connects Codex to the locally installed VeoGenie desktop app through MCP.
 
-## Included Skills
-
-The plugin includes one core control skill and four creative/QA skills:
-
-- `veogenie`: safe MCP inspection, permissions, run/poll, result handoff, and export rules.
-- `veogenie-workflow-designer`: workflow node/edge planning, dependency checks, and recipe quality.
-- `veogenie-product-ad`: product image/video ad briefs, prompt standards, and product fidelity checks.
-- `veogenie-video-director`: video prompts, shot structure, camera motion, frames, duration, and voice guidance.
-- `veogenie-result-qa`: node-specific output verification, media count checks, and export handoff.
-
-Creative skills never enable guarded actions by themselves. They must still follow the `veogenie` core permission and result-handoff flow.
-
 ## Requirements
 
 1. Install VeoGenie Tool.
@@ -58,6 +46,18 @@ The default `.mcp.json` is read-only. It lets Codex call tools such as:
 - `plan_product_ad_job`
 - `get_command_status`
 - `get_run_orchestration_status`
+
+## Included Skills
+
+The plugin includes several skills for AI Agent work:
+
+- `veogenie`: safe MCP startup, permissions, run/poll, and result handoff.
+- `veogenie-workflow-designer`: workflow recipe design, explicit edge handles, and correct text/image/video/voice port routing.
+- `veogenie-product-ad`: product image/video ad briefs, prompt standards, and product fidelity checks.
+- `veogenie-video-director`: high-quality video prompt/script direction for Google Flow.
+- `veogenie-result-qa`: source-of-truth output verification, `render/qa/` semantic QA exports, and one-retry result correction.
+
+For workflow authoring, the agent should read the workflow designer port contract before writing canvas recipes. Voice input must use `voiceReference:voice -> videoGenerate:video-voice-reference`; if a human is connecting manually and the voice port is not visible, switch `Tao Video` to component/input view before connecting voice.
 
 ## Optional Guards
 
@@ -139,16 +139,19 @@ VeoGenie results must be reported from the app state, not from a new image gener
 
 If the user wants files back in the project, Codex should export each verified `mediaId` with `export_media_to_workspace` after `project_export` is enabled, then report the exported file paths. MCP intentionally does not return media URLs or raw media payloads, so Codex should not display a separate generated preview as the VeoGenie output.
 
+When the user asks Codex to judge whether a result matches the original brief, Codex should use the result QA skill to export candidate media to `render/qa/<job-slug>/`, inspect the exported files when the environment supports that media type, score against the original brief, and retry the same node/group at most once with a targeted correction prompt if no candidate passes.
+
 ## Agent Instructions
 
 This marketplace also includes repo-level instructions for agents:
 
 ```text
 AGENTS.md
+BUSINESS_RULES.md
 CLAUDE.md
 ```
 
-These files define the exact run/poll/album/export sequence for Codex, Claude, and other repo-aware agents. They are exported to the marketplace root and also kept inside `plugins/veogenie`.
+These files define the exact MCP permissions, workflow port rules, run/poll/album/export sequence, and result QA rules for Codex, Claude, and other repo-aware agents. They are exported to the marketplace root and also kept inside `plugins/veogenie`.
 
 ## Export From App Repo
 
@@ -177,6 +180,7 @@ That folder contains only:
 ```text
 .agents/plugins/marketplace.json
 AGENTS.md
+BUSINESS_RULES.md
 CLAUDE.md
 plugins/veogenie
 ```
@@ -187,6 +191,7 @@ The plugin folder contains:
 .codex-plugin/plugin.json
 .mcp.json
 AGENTS.md
+BUSINESS_RULES.md
 CLAUDE.md
 README.md
 PUBLICATION_CHECKLIST.md
@@ -198,6 +203,7 @@ skills/veogenie-workflow-designer/SKILL.md
 skills/veogenie-product-ad/SKILL.md
 skills/veogenie-video-director/SKILL.md
 skills/veogenie-result-qa/SKILL.md
+skills/veogenie-result-qa/references/semantic-result-qa.md
 ```
 
 Point Codex Source to that folder, or copy that folder to a separate public repository. The plugin metadata now points to the verified public marketplace repository and local policy files:
@@ -239,6 +245,7 @@ Use the VeoGenie MCP plugin to check the open desktop app:
 2. Call get_app_status.
 3. Call list_pages.
 4. Call get_current_workflow and report the active page node/edge count.
-5. Optionally call build_product_ad_workflow_recipe for a sample product brief and confirm it only returns a recipe.
+5. Optionally read the workflow designer skill and confirm that voice input uses video-voice-reference.
+6. Optionally call build_product_ad_workflow_recipe for a sample product brief and confirm it only returns a recipe.
 Do not run Google Flow, ChatGPT, GPT Image 2, create/append pages, import media, export files, run_node, run_group, or run_workflow_payload.
 ```

@@ -1,7 +1,7 @@
 {
   "name": "veogenie",
-  "version": "0.1.2",
-  "description": "Connect Codex to the locally installed VeoGenie desktop app through MCP and workflow-quality skills.",
+  "version": "0.1.4",
+  "description": "Connect Codex to the locally installed VeoGenie desktop app through MCP with workflow design, video direction, semantic result QA, one-retry guidance, and agent business rules.",
   "author": {
     "name": "VeoGenie",
     "email": "nhattan658-coder@users.noreply.github.com",
@@ -10,13 +10,13 @@
   "homepage": "https://github.com/nhattan658-coder/veogenie-codex-marketplace#readme",
   "repository": "https://github.com/nhattan658-coder/veogenie-codex-marketplace",
   "license": "Proprietary",
-  "keywords": ["veogenie", "mcp", "codex", "desktop", "workflow"],
+  "keywords": ["veogenie", "mcp", "codex", "desktop", "workflow", "video", "agent"],
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "VeoGenie",
     "shortDescription": "Use the local VeoGenie desktop app from Codex.",
-    "longDescription": "Adds MCP tools that let Codex read and safely control the locally installed VeoGenie desktop app, plus skills for designing higher-quality workflows, product ads, video direction, and result QA. The default configuration is read-only and connects through the app's installed veogenie-mcp.cmd launcher.",
+    "longDescription": "Adds MCP tools, skills, and business rules that let Codex read and safely control the locally installed VeoGenie desktop app, design workflows with correct node ports, write video prompts, verify generated results, export QA candidates to render/qa, and retry once when results drift from the original brief. The default configuration is read-only and connects through the app's installed veogenie-mcp.cmd launcher.",
     "developerName": "VeoGenie",
     "category": "Productivity",
     "capabilities": ["Interactive", "Read"],
@@ -27,8 +27,8 @@
       "Check my open VeoGenie workflow.",
       "List VeoGenie pages and node counts.",
       "Read the current VeoGenie media album.",
-      "Design a VeoGenie product ad workflow from my product brief.",
-      "Review whether my generated VeoGenie result is ready to export."
+      "Design a VeoGenie workflow with correct text, image, video, and voice ports.",
+      "Verify VeoGenie results against the original brief and retry once if needed."
     ],
     "brandColor": "#22C55E"
   }

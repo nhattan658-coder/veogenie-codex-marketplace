@@ -53,20 +53,26 @@ Agent instruction files must also be present before export:
 
 ```text
 AGENTS.md
+BUSINESS_RULES.md
 CLAUDE.md
 ```
 
-## Skill Pack
+Required skill folders must be present before export:
 
-Verify the plugin includes the default VeoGenie skill pack:
+```text
+skills/veogenie
+skills/veogenie-workflow-designer
+skills/veogenie-product-ad
+skills/veogenie-video-director
+skills/veogenie-result-qa
+```
 
-- `skills/veogenie/SKILL.md`
-- `skills/veogenie-workflow-designer/SKILL.md`
-- `skills/veogenie-product-ad/SKILL.md`
-- `skills/veogenie-video-director/SKILL.md`
-- `skills/veogenie-result-qa/SKILL.md`
+The result QA skill must include:
 
-Each skill must have YAML frontmatter with only `name` and `description`. Creative skills are guidance only; they must not enable MCP write/run/export guards or bypass app-verified result handoff.
+```text
+skills/veogenie-result-qa/references/result-handoff-checklist.md
+skills/veogenie-result-qa/references/semantic-result-qa.md
+```
 
 `npm run plugin:export` rejects plugin metadata if any public plugin metadata file still contains local-test URLs.
 
@@ -93,7 +99,7 @@ dist/codex-marketplace
 ```
 
 This folder contains `.agents/plugins/marketplace.json` plus `plugins/veogenie`, and does not contain the desktop app source.
-It also includes root-level `AGENTS.md` and `CLAUDE.md` so Codex and Claude can read the exact MCP run/export workflow before using the plugin.
+It also includes root-level `AGENTS.md`, `BUSINESS_RULES.md`, and `CLAUDE.md` so Codex and Claude can read the exact MCP run/export workflow before using the plugin.
 
 If publishing via GitHub, push the standalone marketplace root so Codex can add the repo with:
 
@@ -117,7 +123,8 @@ enabled = true
 - `grant_mcp_session_permissions` may be available, but it must only grant temporary permissions after the user explicitly approves the action in chat.
 - Keep `run_workflow_payload` env-only via `VEOGENIE_MCP_ALLOW_RUN=1`; do not allow session grants for raw workflow payloads.
 - Document guarded tools as opt-in only.
-- Document result handoff: Codex must read `get_node_outputs` and node-specific `get_media_album`, then export verified `mediaId` values if files are needed. It must not show a separate chat-generated image as the VeoGenie result.
+- Keep `BUSINESS_RULES.md` aligned with agent docs, especially source-of-truth, explicit handle routing, no duplicate runs, export discipline, and one-retry semantic QA.
+- Document result handoff: Codex must read `get_node_outputs` and node-specific `get_media_album`, then export verified `mediaId` values if files are needed. If semantic QA is requested, Codex should export candidates to `render/qa/`, inspect available local files, and retry at most once. It must not show a separate chat-generated image as the VeoGenie result.
 - Do not include source app code, license issuer/private key, admin routes, media payloads, or customer data in the public plugin repository.
 
 ## Smoke Test

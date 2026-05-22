@@ -2,6 +2,8 @@
 
 These instructions are for agents using the VeoGenie marketplace repository or plugin. They are intentionally outside the skill file so Codex, Claude, and other repo-aware agents can read the workflow before using MCP tools.
 
+Before controlling the app, read `BUSINESS_RULES.md`. It is the mandatory rule set for MCP permissions, workflow ports, run/poll behavior, result verification, export, and semantic QA.
+
 ## Source Of Truth
 
 - The open VeoGenie desktop app is the source of truth for workflow state and generated media.
@@ -20,14 +22,16 @@ Always start with read-only tools:
 
 Do not call `run_node`, `run_group`, canvas-write tools, import, or export during a read-only check.
 
-## Skill Selection
+## Skills
 
-- Use `veogenie` for MCP safety, read-only inspection, permissions, run/poll, result handoff, and export rules.
-- Use `veogenie-workflow-designer` for workflow node/edge planning and dependency checks.
-- Use `veogenie-product-ad` for product image/video ad briefs, prompt standards, and product fidelity.
-- Use `veogenie-video-director` for video prompts, camera motion, frame planning, duration, and voice guidance.
-- Use `veogenie-result-qa` before reporting completion or exporting generated media.
-- Creative skills are guidance only; they do not enable MCP write/run/export guards.
+Use the plugin skills by task:
+
+- `veogenie-workflow-designer`: create/append workflow recipes and connect ports. Read its node port contract before writing edges.
+- `veogenie-product-ad`: plan product image/video ad briefs, product fidelity constraints, prompt standards, and campaign variants.
+- `veogenie-video-director`: write video prompts, spoken lines, camera direction, and voice tone.
+- `veogenie-result-qa`: verify node-specific media outputs, export QA candidates to `render/qa/`, judge result drift from the original brief, and retry once when needed.
+
+For voice workflows, the only valid graph edge is `voiceReference:voice -> videoGenerate:video-voice-reference`. If a human connects manually and the voice port is hidden, switch `Tao Video` to component/input view before connecting; do not connect voice to another visible port.
 
 ## Permissions
 
@@ -87,6 +91,21 @@ If export is rejected:
 4. Refresh `get_media_album(nodeId=..., source="generated", type=..., limit=...)`.
 5. Retry the same export once after a short delay.
 6. If it still fails, report the exact rejected command message and leave the result in the VeoGenie app.
+
+## Semantic Result QA
+
+When the user wants result judging or correction:
+
+1. Save the original brief as a checklist before judging output.
+2. Complete the normal node/output/media album checks first.
+3. Export candidate `mediaId` values to `render/qa/<job-slug>/` with `export_media_to_workspace`.
+4. Poll `get_command_status` for each QA export before inspection.
+5. Inspect exported files when the environment supports the media type.
+6. Score each candidate as `pass`, `partial`, or `fail` against the original brief.
+7. If no candidate passes, retry the same node or group once with a targeted correction prompt.
+8. After retry, repeat technical QA and semantic QA once, then report the best verified result or the failure reason.
+
+Do not claim visual semantic QA for videos if the environment cannot inspect playback or frames.
 
 ## Polling And Stop Conditions
 

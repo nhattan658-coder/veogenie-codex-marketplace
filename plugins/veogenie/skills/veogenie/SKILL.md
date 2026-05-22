@@ -11,13 +11,6 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 - The local backend should answer `http://127.0.0.1:8788/health`.
 - The installed MCP launcher should exist at `D:\VeoGenie Tool\veogenie-mcp.cmd`.
 
-## Companion Skills
-
-- Use `veogenie-workflow-designer` when the task is to design, inspect, or improve workflow node structure.
-- Use `veogenie-product-ad` when the task is product images, product videos, social ads, ecommerce visuals, or campaign variants.
-- Use `veogenie-video-director` when the task is video prompt direction, storyboard, camera movement, frame planning, or voice guidance.
-- Use `veogenie-result-qa` when the task is to verify generated media, compare results with a brief, or export verified app media.
-
 ## Default Safe Flow
 
 1. Call `get_mcp_capabilities`.
@@ -29,12 +22,19 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 7. Use `plan_product_ad_job` for an end-to-end product ad tool-call plan; it is read-only and does not execute the plan.
 8. After a guarded `run_node` or `run_group`, use `get_run_orchestration_status` with the returned command id before deciding whether to poll again or read final outputs.
 
+## Specialized Skills
+
+- Use `veogenie-workflow-designer` when creating or appending workflow recipes, choosing node types, or connecting text/image/video/voice ports. It contains the authoritative port contract for `frame-start`, `frame-end`, `video-reference-image`, and `video-voice-reference`.
+- Use `veogenie-video-director` when writing video prompts, spoken lines, voice tone, camera direction, or model-aware video instructions.
+- Use `veogenie-result-qa` after node/group runs to verify outputs, read node-specific media ids, export QA candidates to `render/qa/`, judge drift from the original brief, retry once when needed, and export final files without substituting chat-generated media.
+
 ## Result Handoff
 
 - Treat the VeoGenie desktop app as the source of truth. Do not generate, redraw, attach, or display a separate AI image in chat as if it were a VeoGenie result.
 - After a run finishes, call `get_node_outputs` and then `get_media_album` with the exact output `nodeId`, `source="generated"`, and the expected `type`.
 - Compare the returned media count with the node `resultCount` or `assetHistory` count before saying the job is complete.
 - If the user wants the actual files outside the app, use `export_media_to_workspace` for each `mediaId` from `get_media_album` after `project_export` is enabled. Report the exported paths/media ids, not a new chat-generated preview.
+- If the user asks for result quality judging, export candidates to `render/qa/<job-slug>/`, inspect the exported files when the environment supports the media type, and retry the same node or group at most once if no candidate matches the original brief.
 - If the media cannot be verified or exported, say that directly and leave the result in the VeoGenie app.
 
 ## Guarded Tools

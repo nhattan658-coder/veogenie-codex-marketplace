@@ -1,59 +1,67 @@
 # VeoGenie Workflow Patterns
 
-## Product Image Set
+Use these as safe starting points for MCP workflow recipes. Keep all handles explicit.
 
-Use when the user wants product images, thumbnails, hero images, marketplace images, or social post visuals.
+## Product Key Visual
 
-Recommended shape:
+Nodes:
 
-1. `imageReference` for the product photo.
-2. `textPrompt` for the product-shot direction.
-3. Optional `aiAssistant` to rewrite the prompt into a tighter production prompt.
-4. `imageGenerate` for generated variants.
+- `imageReference`: product image, empty at recipe time.
+- `textPrompt`: image direction.
+- `imageGenerate`: key visual output.
 
-Quality notes:
+Edges:
 
-- Preserve the product's visible identity, packaging, color, proportions, and logo placement.
-- Change environment, lighting, props, and composition rather than inventing a different product.
-- Generate multiple variants only when the user wants options or the brief is broad.
+- `textPrompt:text -> imageGenerate:text`
+- `imageReference:image -> imageGenerate:image`
 
-## Product Video Ad
+Use this when the user asks for product photos, campaign key visuals, catalog images, or ad stills.
 
-Use when the user wants a product video, social ad, launch spot, or animated product scene.
+## Product Video From Generated Image
 
-Recommended shape:
+Nodes:
 
-1. `imageReference` for the product photo.
-2. `textPrompt` for campaign intent and visual direction.
-3. `imageGenerate` for a clean hero frame or key visual.
-4. Optional `aiAssistant` for shot direction or voice/script.
-5. `videoGenerate` using the hero frame as the start frame or visual reference.
+- Product key visual pattern.
+- `aiAssistant`: writes video script or prompt.
+- `videoGenerate`: creates final video.
 
-Dependency rules:
+Edges:
 
-- Do not run video until upstream image output is `success`.
-- Use `frame-start` for a deliberate opening frame.
-- Use `frame-end` only when the user asks for a specific ending state.
-- Use `video-reference-image` for additional visual references that are not start/end frames.
+- `imageGenerate:image -> videoGenerate:frame-start`
+- `aiAssistant:text -> videoGenerate:text`
 
-## Prompt Development Workflow
+Only connect the generated image to `video-reference-image` if the user wants it as a reference/component, not as the first frame.
 
-Use when the user asks for a better prompt, style exploration, storyboard, or creative direction but does not ask to generate media yet.
+## Product Video With Reference Images
 
-Recommended shape:
+Use this when the user provides several product/person/style images.
 
-1. `textPrompt` for the user's rough brief.
-2. `aiAssistant` to produce structured prompt(s), shot list, or variants.
-3. Optional downstream image/video nodes only after the user asks to build or run the workflow.
+Edges:
 
-## Existing Workflow Review
+- Main first frame: `imageReference:image -> videoGenerate:frame-start`
+- Optional end frame: `imageReference:image -> videoGenerate:frame-end`
+- Additional product/style/person references: `imageReference:image -> videoGenerate:video-reference-image`
+- Prompt: `textPrompt:text -> videoGenerate:text`
 
-Use when the user asks whether a workflow is ready.
+Do not put all images into `frame-start`.
 
-Check:
+## Video With Voice
 
-- Output node has a valid prompt or assistant text dependency.
-- Required image/frame/voice inputs are connected directly to the output node.
-- No locked `characterReference` dependency is present.
-- Result count, aspect ratio, model, and duration fit the user request.
-- No output node is running before edits or page changes.
+Nodes:
+
+- `textPrompt` or `aiAssistant` for the spoken/video prompt.
+- `voiceReference` for the selected voice.
+- `videoGenerate`.
+
+Edges:
+
+- `textPrompt:text -> videoGenerate:text` or `aiAssistant:text -> videoGenerate:text`
+- `voiceReference:voice -> videoGenerate:video-voice-reference`
+
+If using the UI manually and the voice port is not visible, switch `Tao Video` to component/input view before connecting.
+
+## Multi-Variant Results
+
+Use `resultCount` on `imageGenerate` or `videoGenerate` instead of cloning identical branches when the user wants variants from the same prompt and inputs.
+
+After running, verify count with `get_node_outputs` and node-specific `get_media_album`.

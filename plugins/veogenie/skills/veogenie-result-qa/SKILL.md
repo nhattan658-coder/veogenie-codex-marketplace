@@ -1,49 +1,54 @@
 ---
 name: veogenie-result-qa
-description: Verify VeoGenie generated results, media album metadata, and exports before reporting completion. Use when Codex needs to review generated images/videos/text, compare outputs with the user brief, check node-specific media counts, export verified media ids, or diagnose incomplete VeoGenie result handoff.
+description: Verify, report, semantically judge, retry once when needed, and export VeoGenie results from the desktop app source of truth. Use after run_node or run_group, when Codex needs to confirm generated image/video/text outputs, compare media counts with resultCount, retrieve node-specific media ids, export files to workspace render/ or render/qa/, inspect whether results match the original brief, or avoid substituting chat-generated media for app results.
 ---
 
 # VeoGenie Result QA
 
-## Scope
+## Source Of Truth
 
-Use this skill after a workflow run, export request, or result review. Use the core `veogenie` skill for the exact MCP calls and guarded export permissions.
+The open VeoGenie desktop app is authoritative. Do not create or show a separate chat-generated image/video as if it came from VeoGenie.
 
-## Default Process
+Read `references/result-handoff-checklist.md` before reporting final results.
 
-1. Read the current workflow or target page state.
-2. Read the target output node with `get_node_outputs`.
-3. Read `get_media_album` with the exact output `nodeId`, `source="generated"`, expected `type`, and expected limit.
-4. Compare returned media count with `resultCount` or the node's asset history.
-5. If files are requested, export each verified `mediaId` with the appropriate guarded export tool.
-6. Poll `get_command_status` for each export command.
-7. Report only app-verified media ids, exported paths, node ids, and any rejected command messages.
+Read `references/semantic-result-qa.md` when the user asks to judge whether an image/video matches the original request, detect drift from the prompt, choose the best candidate, or regenerate one failed result once.
 
-## Never Substitute Results
+## Required Sequence
 
-- Do not generate, redraw, or attach a separate chat image as if it came from VeoGenie.
-- Do not report success from a recipe, plan, or prompt alone.
-- Do not search browser cache, app storage, IndexedDB, or temp folders for media.
-- Do not use media URLs, base64, blob URLs, or data URLs as a handoff path.
+After a node or group run:
 
-## Creative Quality Review
+1. Poll `get_run_orchestration_status` until `summary.shouldPollAgain=false`.
+2. Stop if the summary phase is `error`.
+3. Call `get_node_outputs` with the exact output `nodeId`.
+4. Call `get_media_album` with the exact output `nodeId`, `source="generated"`, expected `type`, and expected `limit`.
+5. Compare the returned media count with `resultCount` or output history.
+6. If the user wants files, export each verified `mediaId` with `export_media_to_workspace` after `project_export` permission is enabled.
+7. Poll `get_command_status` for every export command.
 
-When the user asks whether results are good, check:
+## Semantic QA And One Retry
 
-- Alignment with the original brief.
-- Product or subject fidelity.
-- Composition and crop safety for the requested aspect ratio.
-- Readability of labels, logos, and important product features.
-- Absence of unwanted text, duplicate products, warped shapes, or wrong backgrounds.
-- For video: subject visibility, motion coherence, stable lighting, and usable opening/ending frames.
+When semantic QA is requested:
 
-## Failure Handling
+1. Preserve the original user brief as a short checklist before judging.
+2. Export candidate media to a QA subfolder under `render/`, for example `render/qa/<job-slug>/`, using `export_media_to_workspace`.
+3. Inspect exported files when the environment supports that media type.
+4. Score candidates with the rubric in `references/semantic-result-qa.md`.
+5. If at least one candidate passes and the user did not require every result to pass, select the best passing result.
+6. If no candidate passes, run the same node or group at most one more time with a targeted correction prompt.
+7. Repeat technical QA and semantic QA once after retry. Do not loop.
 
-- If the media count is short, say exactly which node/count is incomplete and avoid claiming completion.
-- If export is rejected, refresh workflow, node output, and album metadata, then retry the same export once.
-- If the retry fails, report the rejected command message and leave the result in the app.
-- If an output node is still running, continue polling with `get_run_orchestration_status`; do not submit a duplicate run.
+Do not claim visual QA was performed for a video if the environment could not inspect video frames or playback.
 
-## References
+## Reporting
 
-Read `references/result-handoff-checklist.md` for the final reporting and export checklist.
+Report:
+
+- Page name or id.
+- Output node id.
+- Verified generated media count.
+- Media ids used.
+- Exported file paths when export succeeds.
+- `qaStatus`, `retryAttempted`, selected media id, and QA reasons when semantic QA was used.
+- Rejected command messages if run/export fails.
+
+Do not claim success if media count, node id, or export command status was not verified.

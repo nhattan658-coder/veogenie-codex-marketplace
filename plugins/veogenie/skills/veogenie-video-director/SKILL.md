@@ -1,52 +1,40 @@
 ---
 name: veogenie-video-director
-description: Direct VeoGenie video workflows and prompts. Use when Codex needs to create or improve video generation prompts, storyboard short ads, choose start/end frames, handle video reference images or voice references, set duration/model guidance, or plan a safe video run through the VeoGenie MCP plugin.
+description: Write and refine high-quality VeoGenie video prompts for Google Flow video generation. Use when Codex needs to direct scenes, camera motion, identity preservation, product or UGC ads, spoken lines, voice tone, frame/reference image usage, model-aware duration/aspect choices, or video prompt QA before running a videoGenerate node.
 ---
 
 # VeoGenie Video Director
 
-## Scope
+## Start
 
-Use this skill for video creative direction. Use the core `veogenie` skill for MCP permissions, run/poll behavior, and result handoff.
+Use this skill when the user asks for video quality, video script, video prompt, UGC ad direction, voice tone, or scene/camera planning.
 
-## Default Process
+Read `references/video-prompt-rubric.md` before writing the final prompt.
 
-1. Identify the clip purpose, output duration, aspect ratio, subject, start state, end state, and motion.
-2. Check whether the video needs a generated hero frame first.
-3. Use direct text input from `textPrompt` or `aiAssistant.generatedText`.
-4. Use `frame-start` and `frame-end` only for deliberate start/end states.
-5. Use `video-reference-image` for supporting images that should influence the scene but are not start/end frames.
-6. Use `video-voice-reference` only for voice direction or saved/custom Flow voice.
-7. Do not run video until upstream image/text dependencies are complete.
+If the task also requires creating or connecting workflow nodes, use `veogenie-workflow-designer` and its port contract.
 
-## Prompt Standards
+## Prompt Workflow
 
-Write video prompts as production direction:
+1. Identify the output format: product ad, UGC, cinematic, tutorial, demo, before/after, or story.
+2. Identify source inputs: prompt text, start frame, end frame, reference images, voice reference.
+3. Write one clear production brief for the video composer.
+4. Include camera, motion, lighting, subject action, and continuity constraints.
+5. If a `voiceReference` node is connected, include the voice name/description as a spoken-voice direction unless it is a custom saved Flow voice that automation can attach through the picker.
+6. Avoid asking for visible subtitles, captions, logos, or watermarks unless the user explicitly wants them.
 
-- Subject: what must remain visually consistent.
-- Scene: location, set, surface, atmosphere, and props.
-- Camera: shot size, lens feel, movement, speed, and framing.
-- Motion: product/action movement over time.
-- Lighting: stable lighting style and reflection behavior.
-- Timing: simple beginning, middle, and ending beat for short clips.
-- Constraints: no extra text, no logo changes, no warped product, no abrupt scene jump.
+## Model Notes
 
-## Model And Duration
+- Use `9:16` for short-form social/UGC unless the user says otherwise.
+- `Veo 3.1 - Lite/Fast/Quality` currently uses the app-side default duration because Flow may not show a duration selector.
+- `Omni Flash` can use explicit duration settings when Flow exposes them.
+- Do not change workflow wiring from this skill; route ports through `veogenie-workflow-designer`.
 
-- For `Omni Flash`, treat duration as an explicit setting when available.
-- For `Veo 3.1` Lite/Fast/Quality, use the app's current default duration behavior unless the app exposes duration controls.
-- Keep short ad prompts focused. A 6-8 second clip should have one main action, not a full narrative.
+## Before Run
 
-## Voice Rules
+Check the prompt for:
 
-- For preset voices in the app's voice list, use prompt guidance when the current Flow picker does not expose a voice tab.
-- For custom/saved Flow voices, use the picker path only when the voice must be attached and verified.
-- If the required custom voice cannot be verified, stop before `Generate`.
-
-## Locked Character Rule
-
-Do not add or depend on `characterReference` / `Nhan Vat` while it is locked. Character description can be plain prompt context only when it is not required as a Flow character chip.
-
-## References
-
-Read `references/video-prompt-rubric.md` when writing a video prompt, shot list, or short ad structure.
+- The subject is identifiable and consistent.
+- The first frame/end frame intent is clear if those ports are connected.
+- Reference images are described as references, not frames, if connected to `video-reference-image`.
+- Voice instructions do not contradict the selected `voiceReference`.
+- The prompt does not request text overlays unless intentional.
