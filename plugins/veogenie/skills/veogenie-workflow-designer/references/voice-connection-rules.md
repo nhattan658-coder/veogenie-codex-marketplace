@@ -41,10 +41,13 @@ Current automation behavior:
 - Preset voices are sent as a video prompt hint because the current Flow picker may not render a usable `Giong noi` tab for those presets.
 - The backend logs this path as `voice-preset-prompt-hint`.
 - The graph edge is still `voiceReference:voice -> videoGenerate:video-voice-reference`.
+- For MCP-authored workflows, `voiceName` must be an exact built-in preset name. Do not use descriptive text such as "young soft female voice" as `voiceName`; put that in `voiceDescription`.
 
 ## Custom Or Saved Flow Voices
 
-Custom or saved Flow voices use the picker path:
+Custom or saved Flow voices are not available to MCP-authored workflows unless there is an explicit, verified custom voice selection mechanism. Do not invent a custom voice search term.
+
+The picker path is reserved for a future/custom UI mode where the saved voice is already known exactly:
 
 1. Open the composer component picker.
 2. Select the `Giong noi` / voice tab.

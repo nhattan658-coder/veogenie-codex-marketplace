@@ -1,55 +1,61 @@
-# Claude Instructions For VeoGenie
+# Claude Guide For VeoGenie
 
-Follow `AGENTS.md` and `BUSINESS_RULES.md` in this repository first. `BUSINESS_RULES.md` is the mandatory rule set for MCP permissions, workflow ports, run/poll behavior, result verification, export, and semantic QA. This file highlights the Claude-specific behavior expected when controlling VeoGenie through MCP.
+Follow `AGENTS.md` first. This file keeps the same guidance short for Claude-style agents.
 
-## Core Rule
+## Basic Flow
 
-The VeoGenie desktop app is authoritative. Claude must not generate or display a separate image in chat and describe it as a VeoGenie result. Generated media must be verified through `get_node_outputs` and node-specific `get_media_album`.
+1. Inspect the app with `get_mcp_capabilities`, `get_app_status`, `list_pages`, and `get_current_workflow`.
+2. Ask for or use only the permissions needed for the user's requested action.
+3. Create or append workflow pages only when the user wants a workflow change.
+4. Edit existing node fields with `update_workflow_nodes` or delete active-page nodes with `delete_workflow_nodes` only when the user asks, `canvas_write` is enabled, and `confirmModifyCurrentPage=true` is present.
+5. Run nodes/groups with `run_node` or `run_group`.
+6. Poll with `get_run_orchestration_status`.
+7. Read final state with `get_node_outputs` and `get_media_album`.
+8. Export with `export_media_to_workspace` when the user wants files in the project.
 
-## Required Flow
+`update_workflow_nodes` and `delete_workflow_nodes` do not run Google Flow, ChatGPT, GPT Image 2, or raw `/workflow/run`. Do not use them to edit generated output/status fields, delete pages, or delete media files.
 
-1. Start read-only: `get_mcp_capabilities`, `get_app_status`, `list_pages`, `get_current_workflow`.
-2. Request or use explicit session permissions only for the actions needed.
-3. For node runs, call `run_node` once, then poll `get_run_orchestration_status` with the returned `commandId`.
-4. After success, read `get_node_outputs(nodeId=...)`.
-5. Read `get_media_album(nodeId=..., source="generated", type=..., limit=<expected count>)`.
-6. Export with `export_media_to_workspace` only using `mediaId` values returned by that album query.
-7. Poll `get_command_status` for each export command.
-8. If semantic QA is requested, export candidates to `render/qa/<job-slug>/`, inspect the exported files when possible, and judge against the original brief.
+## Node Roles
 
-## Workflow Ports
+- `textPrompt`: prompt text.
+- `imageReference`: local/product/reference image.
+- `voiceReference`: reusable built-in voice preset for video. Use an exact preset name in `voiceName`; put descriptive tone notes in `voiceDescription`.
+- `aiAssistant`: generated text for later nodes.
+- `imageGenerate`: image output.
+- `videoGenerate`: video output.
 
-When creating or editing recipes, use the workflow designer skill/reference contract if available. Always set explicit `sourceHandle` and `targetHandle`.
-
-Voice input must use:
+## Useful Connections
 
 ```text
+textPrompt:text -> imageGenerate:text
+imageReference:image -> imageGenerate:image
+
+textPrompt:text -> videoGenerate:text
+aiAssistant:generatedText -> videoGenerate:text
+
+imageReference:image -> videoGenerate:frame-start
+imageReference:image -> videoGenerate:frame-end
+imageReference:image -> videoGenerate:video-reference-image
+
+imageGenerate:generatedAsset -> videoGenerate:frame-start
+imageGenerate:generatedAsset -> videoGenerate:frame-end
+imageGenerate:generatedAsset -> videoGenerate:video-reference-image
+
 voiceReference:voice -> videoGenerate:video-voice-reference
 ```
 
-Do not connect voice to text, frame, or reference-image ports. If a human connects manually and the video voice port is hidden, switch `Tao Video` to component/input view before connecting.
+Use `frame-start` for the first frame, `frame-end` for the last frame, and `video-reference-image` for product/style/character references.
 
-## Export Discipline
+## Shared Voice
 
-- Pass `pageId` from the album item when available.
-- Pass absolute `workspaceRoot`.
-- Keep output inside `<workspaceRoot>/render/`.
-- Use `render/qa/<job-slug>/` for candidate files exported only to inspect prompt alignment before final handoff.
-- Do not use filesystem search, browser cache, app data folders, data URLs, or base64 to recover generated media.
-- If export rejects a media id, refresh workflow/output/album and retry once. Then report the exact rejection.
+For many videos with the same narration voice, create one `voiceReference` node with an exact built-in preset name and connect it to every `videoGenerate:video-voice-reference` input. Keep each video's prompt and frame inputs separate unless the user wants them shared too.
 
-## Semantic QA And Retry
+## Run Scheduling
 
-- Preserve the original user brief as the judging checklist.
-- Judge exported candidates as `pass`, `partial`, or `fail` for prompt alignment, required elements, identity/product consistency, style, technical quality, and forbidden elements.
-- If at least one candidate passes, select it and do not rerun.
-- If no candidate passes, rerun the same node or group at most once with a targeted correction prompt.
-- Do not claim visual semantic QA for a video if playback or frame inspection was not available.
-- Report `qaStatus`, `retryAttempted`, selected `mediaId`, QA export path, and concise QA reasons.
+Do not wait for one independent branch to finish before starting another. Inspect the workflow, queue all ready independent output nodes with separate `run_node` calls, keep each `commandId`, and poll each with `get_run_orchestration_status`.
 
-## Never Do
+Only wait when there is a real dependency: a downstream node must not run until the upstream node is `success` and has the expected text/image/video output. Never queue the same node twice while its command is queued/dispatched or its output is running. Prefer `run_group` when a group should enforce dependencies internally.
 
-- Do not call `run_workflow_payload` for normal UI node orchestration.
-- Do not run Google Flow, ChatGPT, or GPT Image 2 during read-only checks.
-- Do not submit duplicate runs while a command or output is still pending/running.
-- Do not claim files were exported unless `get_command_status` confirms the export command was accepted.
+## Result Handoff
+
+Report results from VeoGenie state, not from a separate chat-generated preview. Use media ids from `get_media_album`; if export succeeds, report the file paths.

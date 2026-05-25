@@ -53,7 +53,6 @@ Agent instruction files must also be present before export:
 
 ```text
 AGENTS.md
-BUSINESS_RULES.md
 CLAUDE.md
 ```
 
@@ -99,7 +98,7 @@ dist/codex-marketplace
 ```
 
 This folder contains `.agents/plugins/marketplace.json` plus `plugins/veogenie`, and does not contain the desktop app source.
-It also includes root-level `AGENTS.md`, `BUSINESS_RULES.md`, and `CLAUDE.md` so Codex and Claude can read the exact MCP run/export workflow before using the plugin.
+It also includes root-level `AGENTS.md` and `CLAUDE.md` so Codex and Claude can read the basic node/input/voice workflow before using the plugin.
 
 If publishing via GitHub, push the standalone marketplace root so Codex can add the repo with:
 
@@ -123,8 +122,8 @@ enabled = true
 - `grant_mcp_session_permissions` may be available, but it must only grant temporary permissions after the user explicitly approves the action in chat.
 - Keep `run_workflow_payload` env-only via `VEOGENIE_MCP_ALLOW_RUN=1`; do not allow session grants for raw workflow payloads.
 - Document guarded tools as opt-in only.
-- Keep `BUSINESS_RULES.md` aligned with agent docs, especially source-of-truth, explicit handle routing, no duplicate runs, export discipline, and one-retry semantic QA.
-- Document result handoff: Codex must read `get_node_outputs` and node-specific `get_media_album`, then export verified `mediaId` values if files are needed. If semantic QA is requested, Codex should export candidates to `render/qa/`, inspect available local files, and retry at most once. It must not show a separate chat-generated image as the VeoGenie result.
+- Keep `AGENTS.md` and `CLAUDE.md` short and practical: node roles, correct input routing, shared voice wiring, basic run/poll/export flow.
+- Document result handoff simply: Codex should read `get_node_outputs` and node-specific `get_media_album`, then export `mediaId` values if files are needed.
 - Do not include source app code, license issuer/private key, admin routes, media payloads, or customer data in the public plugin repository.
 
 ## Smoke Test

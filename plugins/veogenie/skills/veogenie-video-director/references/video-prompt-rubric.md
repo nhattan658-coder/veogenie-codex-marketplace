@@ -16,6 +16,17 @@ Include these ideas in natural prose, not as rigid headings unless helpful:
 - Voice/spoken line: spoken language, line, tone, pacing, speaker.
 - Constraints: no unwanted text, logo, watermark, identity change, morphing, or distorted hands/faces.
 
+## Photorealistic Quality Bar
+
+For realistic product, person, lifestyle, or UGC videos, make the prompt concrete enough that the model has a single believable shot to execute:
+
+- Use physical camera language: handheld phone, tripod, slow dolly, macro push-in, shallow depth of field, natural lens compression.
+- Specify real-world light behavior: soft window light, diffused studio key, rim light, practical reflections, contact shadows, accurate skin or material highlights.
+- Keep motion plausible: small human gestures, product turntable, liquid pour, steam, fabric movement, handheld micro-shake, no impossible morphing.
+- Preserve source identity: same face, body proportions, product silhouette, color, label placement, material, and scale.
+- Prefer one scene and one main action. Avoid asking for multiple unrelated locations, time jumps, or too many campaign ideas in one generation.
+- Do not request visible text, captions, UI, subtitles, or logo changes unless the user explicitly asks for them.
+
 ## Identity And Product Continuity
 
 When using a person or product reference:
@@ -72,6 +83,14 @@ Use this structure for polished product ads:
 Premium product commercial, [aspect ratio]. Product must keep the exact shape, label/color/material from the reference. Scene: [surface/background/lighting]. Action: [product reveal/use/benefit]. Camera: [macro/slow push/parallax]. Lighting: [studio/natural]. Motion: [steam/splash/hand movement]. Constraints: no extra text, no fake logo changes, no warped packaging, no watermark.
 ```
 
+## Photorealistic Video Template
+
+Use this template when the user asks for realistic, premium, cinematic, or high-quality video:
+
+```text
+Photorealistic [aspect ratio] video, [duration/model expectation], [format such as premium product ad, natural UGC, lifestyle demo]. Keep [subject/product] exactly consistent with the reference: [identity, shape, color, label, material]. Scene: [specific real location or set], with [props/background] that support the product and do not compete. Action: [single clear beginning, middle, end]. Camera: [framing, lens feel, movement, stabilization]. Lighting: [realistic source, softness, reflections, shadows]. Motion details: [small believable subject/product/environment motion]. Voice, if any: [language, exact spoken line, tone, speaker]. Constraints: no extra text, no watermark, no logo changes, no face or product morphing, no distorted hands, no sudden scene jumps.
+```
+
 ## Final QA
 
 Before using the prompt:
@@ -81,3 +100,6 @@ Before using the prompt:
 - It says what not to change.
 - It avoids conflicting camera directions.
 - It does not ask the model to create UI text unless intentional.
+- It has a realistic camera, lighting, and motion plan instead of only quality adjectives.
+- It preserves every required frame/reference/voice role without mixing `frame-start`, `frame-end`, `video-reference-image`, or `voiceReference`.
+- It is short enough for the composer to keep the main instruction intact.

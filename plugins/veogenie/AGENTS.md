@@ -1,129 +1,108 @@
-# VeoGenie Agent Instructions
+# VeoGenie Agent Guide
 
-These instructions are for agents using the VeoGenie marketplace repository or plugin. They are intentionally outside the skill file so Codex, Claude, and other repo-aware agents can read the workflow before using MCP tools.
+This file is a lightweight working guide for AI agents using the VeoGenie MCP plugin. It explains the normal node roles, input wiring, voice reuse, and basic tool flow.
 
-Before controlling the app, read `BUSINESS_RULES.md`. It is the mandatory rule set for MCP permissions, workflow ports, run/poll behavior, result verification, export, and semantic QA.
+## Start
 
-## Source Of Truth
-
-- The open VeoGenie desktop app is the source of truth for workflow state and generated media.
-- Do not display, synthesize, redraw, or attach a new chat-generated image as if it came from VeoGenie.
-- MCP responses intentionally do not include media URLs, data URLs, blob URLs, or base64 payloads.
-- If the user needs actual files, export verified `mediaId` values from `get_media_album`; do not search browser/app cache folders.
-
-## First Calls
-
-Always start with read-only tools:
+Before changing anything, inspect the open desktop app:
 
 1. `get_mcp_capabilities`
 2. `get_app_status`
 3. `list_pages`
 4. `get_current_workflow`
 
-Do not call `run_node`, `run_group`, canvas-write tools, import, or export during a read-only check.
+Use write/run/export tools only when the user asks for that action and grants the needed session permission or environment guard.
 
-## Skills
+Canvas mutation tools still go through the desktop app command queue. `update_workflow_nodes` may edit only schema-safe node fields such as title, prompt, model, aspect ratio, result count, duration, position, size, and voice metadata. `delete_workflow_nodes` may remove nodes from the active page and connected edges; deleting a group also removes child nodes. These tools require `canvas_write` plus `confirmModifyCurrentPage=true`, return a rollback token, and must not be used to run Google Flow, ChatGPT, GPT Image 2, delete pages, delete media, or edit generated output/status fields.
 
-Use the plugin skills by task:
+## Node Basics
 
-- `veogenie-workflow-designer`: create/append workflow recipes and connect ports. Read its node port contract before writing edges.
-- `veogenie-product-ad`: plan product image/video ad briefs, product fidelity constraints, prompt standards, and campaign variants.
-- `veogenie-video-director`: write video prompts, spoken lines, camera direction, and voice tone.
-- `veogenie-result-qa`: verify node-specific media outputs, export QA candidates to `render/qa/`, judge result drift from the original brief, and retry once when needed.
+- `textPrompt`: stores text instructions. Connect it to image/video/assistant nodes when the prompt should drive generation.
+- `imageReference`: stores a user or product image. Use it as an image input, video frame, or general video reference depending on the target port.
+- `voiceReference` / `Giong Noi`: stores a built-in voice preset. Use it only for video voice input. Put the exact preset name in `voiceName`; do not put a free-text description such as "young soft female voice" in `voiceName`.
+- `aiAssistant` / `Tro Ly AI`: produces text. Use its generated text as a prompt for downstream image or video nodes.
+- `imageGenerate` / `Tao Anh`: creates images from text and optional image references.
+- `videoGenerate` / `Tao Video`: creates videos from text, optional start/end frames, optional reference images, and optional voice.
+- `group`: runs a set of connected nodes while respecting their dependencies.
 
-For voice workflows, the only valid graph edge is `voiceReference:voice -> videoGenerate:video-voice-reference`. If a human connects manually and the voice port is hidden, switch `Tao Video` to component/input view before connecting; do not connect voice to another visible port.
+## Common Connections
 
-## Permissions
+Use explicit handles when creating recipes:
 
-Prefer session permissions when the user explicitly approves actions in chat:
+```text
+textPrompt:text -> imageGenerate:text
+imageReference:image -> imageGenerate:image
 
-```json
-{
-  "permissions": ["canvas_write", "media_import", "actions", "project_export"],
-  "confirmGrantSessionPermissions": true,
-  "approvalNote": "User approved creating a workflow, importing a local image, running nodes, and exporting verified generated media."
-}
+textPrompt:text -> videoGenerate:text
+aiAssistant:generatedText -> videoGenerate:text
+
+imageReference:image -> videoGenerate:frame-start
+imageGenerate:generatedAsset -> videoGenerate:frame-start
+
+imageReference:image -> videoGenerate:frame-end
+imageGenerate:generatedAsset -> videoGenerate:frame-end
+
+imageReference:image -> videoGenerate:video-reference-image
+imageGenerate:generatedAsset -> videoGenerate:video-reference-image
+
+voiceReference:voice -> videoGenerate:video-voice-reference
 ```
 
-Use only the permissions needed for the task:
+Choose the video image port by meaning:
 
-- `canvas_write`: create/append/rollback workflow pages.
-- `media_import`: attach a local image file to an `imageReference` node.
-- `actions`: run existing output nodes or groups.
-- `project_export`: export generated media into `<workspaceRoot>/render/`.
-- `media_export`: export through a native save dialog.
+- `frame-start`: the image should be the first frame.
+- `frame-end`: the image should be the last frame.
+- `video-reference-image`: the image is a style/product/character/reference image, not a strict first or last frame.
 
-Never use `run_workflow_payload` unless the user/admin has explicitly enabled `VEOGENIE_MCP_ALLOW_RUN=1`. Session grants do not enable it.
+## One Voice For Multiple Videos
 
-## Product Image Job
+To keep several videos on the same voice:
 
-Use this sequence for requests like "create 3 product images from this image and save them":
+1. Create one `voiceReference` node.
+2. Select one exact built-in preset in that node. Put descriptive tone notes in `voiceDescription`, not `voiceName`.
+3. Connect the same voice output to every target video:
 
-1. Call `plan_product_ad_job` or `build_product_ad_workflow_recipe`.
-2. Create the workflow with `create_workflow_page`, or append only if the user asked to modify the current page.
-3. Attach the user image with `attach_local_media_to_node`.
-4. Run the image node with `run_node`.
-5. Poll `get_run_orchestration_status` using the returned `commandId`.
-6. While `summary.shouldPollAgain` is true, wait at least `nextPollAfterMs` when provided, then poll again. Do not call `run_node` again.
-7. After completion, call `get_node_outputs` with the exact output `nodeId`.
-8. Call `get_media_album` with the exact output `nodeId`, `source="generated"`, `type="image"`, and `limit=<expected resultCount>`.
-9. Verify the returned media count matches the expected count before claiming success.
-10. Export each returned `mediaId` with `export_media_to_workspace`, one media item per tool call.
-11. Poll `get_command_status` for each export command until it is `accepted` or `rejected`.
+```text
+voiceReference:voice -> videoGenerate:video-voice-reference
+voiceReference:voice -> videoGenerate:video-voice-reference
+voiceReference:voice -> videoGenerate:video-voice-reference
+```
 
-## Export Rules
+Each `videoGenerate` node can still have its own text prompt, start frame, end frame, and reference images. The shared voice node keeps the spoken voice consistent across the batch.
 
-For `export_media_to_workspace`:
+## Basic Workflows
 
-- Use a `mediaId` returned by node-specific `get_media_album`.
-- Pass `pageId` from the album item when available.
-- Pass absolute `workspaceRoot`.
-- Use `renderDir="render"` unless the user asked for a subfolder under `render/`.
-- Set `confirmWriteProjectRender=true`.
-- Use stable filenames such as `product-name-1.png`, `product-name-2.png`, `product-name-3.png`.
-- Keep `confirmOverwrite=false` unless the user explicitly approves overwriting.
+For a product image job:
 
-If export is rejected:
+1. Create or plan a workflow with `build_product_ad_workflow_recipe` or `plan_product_ad_job`.
+2. Create a new page with `create_workflow_page`, or append only when the user wants the current page changed.
+3. Attach local product images with `attach_local_media_to_node`.
+4. Run `imageGenerate` nodes with `run_node` or run the whole group with `run_group`.
+5. Poll with `get_run_orchestration_status`.
+6. Read outputs with `get_node_outputs` and media metadata with `get_media_album`.
+7. Export files with `export_media_to_workspace` when the user wants files in the workspace.
 
-1. Do not search `%LOCALAPPDATA%`, browser cache, IndexedDB, or app storage.
-2. Refresh `get_current_workflow`.
-3. Refresh `get_node_outputs(nodeId=...)`.
-4. Refresh `get_media_album(nodeId=..., source="generated", type=..., limit=...)`.
-5. Retry the same export once after a short delay.
-6. If it still fails, report the exact rejected command message and leave the result in the VeoGenie app.
+For a video job:
 
-## Semantic Result QA
+1. Connect text into `videoGenerate:text`.
+2. Connect start/end frames only when the user wants exact first/last frames.
+3. Connect product/style images to `video-reference-image`.
+4. Connect voice to `video-voice-reference` when narration voice matters.
+5. Run only after required upstream image/text nodes have completed.
 
-When the user wants result judging or correction:
+## Run Scheduling
 
-1. Save the original brief as a checklist before judging output.
-2. Complete the normal node/output/media album checks first.
-3. Export candidate `mediaId` values to `render/qa/<job-slug>/` with `export_media_to_workspace`.
-4. Poll `get_command_status` for each QA export before inspection.
-5. Inspect exported files when the environment supports the media type.
-6. Score each candidate as `pass`, `partial`, or `fail` against the original brief.
-7. If no candidate passes, retry the same node or group once with a targeted correction prompt.
-8. After retry, repeat technical QA and semantic QA once, then report the best verified result or the failure reason.
+Do not serialize independent work by habit. Before running, inspect `get_current_workflow` and identify ready output nodes:
 
-Do not claim visual semantic QA for videos if the environment cannot inspect playback or frames.
+- A node is ready when all required direct inputs are present and any upstream output dependency is already `success` with the needed text/image/video asset.
+- Nodes in different branches with no dependency between them can be queued in the same scheduling pass with separate `run_node` calls.
+- After queuing multiple ready nodes, keep every returned `commandId` and poll each one with `get_run_orchestration_status`.
+- Do not queue the same node twice while its command is `queued`/`dispatched` or its output is `running`.
+- Do not queue a downstream node until the upstream node it depends on is `success` and `get_node_outputs` shows the expected output.
+- Prefer `run_group` when the ready nodes are in one group and the app should enforce internal dependencies.
 
-## Polling And Stop Conditions
-
-- Do not submit duplicate runs while command status is `queued` or `dispatched`.
-- Do not submit duplicate runs while an output is `running`.
-- Stop if `get_run_orchestration_status` reports `phase="error"`.
-- Stop if the output node reports `generationStatus="error"`.
-- Do not run video until the required image/text upstream outputs are `success`.
+Example: if three `imageGenerate` nodes each use their own `textPrompt` and `imageReference`, queue all three `run_node` calls first, then poll all three. If one `videoGenerate` uses the first image output as `frame-start`, wait for that image node before running the video node.
 
 ## Reporting
 
-Final answers should include:
-
-- Page name or page id.
-- Output node id.
-- Count of verified generated media.
-- Media ids used for export.
-- Exported file paths when export succeeds.
-- Any rejected command message if export or run fails.
-
-Do not include a fake preview image in the final answer.
+When reporting results, use the app state from `get_node_outputs` and `get_media_album`. If files were exported, include the exported paths and media ids. If generation is still running or an export failed, report that state plainly.

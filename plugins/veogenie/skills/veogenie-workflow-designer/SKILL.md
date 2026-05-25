@@ -40,9 +40,20 @@ For the current page:
 3. Keep the returned `rollbackToken`.
 4. Verify with `get_current_workflow`.
 
+For existing nodes on the current page:
+
+1. Use `update_workflow_nodes` only for schema-safe node fields such as title, prompt, position, size, model, aspect ratio, result count, duration, and voice metadata.
+2. Use `delete_workflow_nodes` only when the user asked to remove nodes; it deletes connected edges and group children.
+3. Both tools require `canvas_write`, `confirmModifyCurrentPage=true`, and command-status polling.
+4. Do not use these tools to run automation, edit generated outputs/status, delete pages, delete media, or change node ids/types.
+
 ## Run Flow
 
 - Use `run_node` or `run_group` only after `actions` permission is enabled.
-- Poll `get_run_orchestration_status` with the returned `commandId`.
-- Do not call `run_node` again while the command is queued/dispatched or output is running.
+- Build a small run plan from the graph before starting: mark nodes ready only when their required direct inputs are present and upstream output dependencies are already `success`.
+- Queue all ready independent output nodes with separate `run_node` calls before polling; keep each returned `commandId`.
+- Poll `get_run_orchestration_status` for every queued command.
+- Do not call `run_node` again for the same node while its command is queued/dispatched or output is running.
+- Do not queue downstream dependent nodes until their upstream outputs exist and are verified with `get_node_outputs`.
+- Prefer `run_group` when nodes are inside one group and the app should enforce internal dependencies.
 - After success, use the `veogenie-result-qa` skill for output verification and export.

@@ -55,7 +55,7 @@ The plugin includes several skills for AI Agent work:
 - `veogenie-workflow-designer`: workflow recipe design, explicit edge handles, and correct text/image/video/voice port routing.
 - `veogenie-product-ad`: product image/video ad briefs, prompt standards, and product fidelity checks.
 - `veogenie-video-director`: high-quality video prompt/script direction for Google Flow.
-- `veogenie-result-qa`: source-of-truth output verification, `render/qa/` semantic QA exports, and one-retry result correction.
+- `veogenie-result-qa`: optional output checking and export handoff when the user asks to inspect or save generated results.
 
 For workflow authoring, the agent should read the workflow designer port contract before writing canvas recipes. Voice input must use `voiceReference:voice -> videoGenerate:video-voice-reference`; if a human is connecting manually and the voice port is not visible, switch `Tao Video` to component/input view before connecting voice.
 
@@ -129,6 +129,8 @@ Do not enable all guards by default.
 
 `get_run_orchestration_status` is read-only. Use it after a guarded `run_node` or `run_group` call to check command ack and sanitized output status before deciding whether to poll again.
 
+`VEOGENIE_MCP_ALLOW_CANVAS_WRITE=1` or session permission `canvas_write` enables guarded canvas writes. `create_workflow_page` creates a new page, `append_workflow_to_current_page` appends a recipe, `update_workflow_nodes` edits schema-safe fields on existing nodes, `delete_workflow_nodes` removes existing nodes and connected edges, and `undo_last_mcp_canvas_write` rolls back the latest MCP canvas write when the token still matches. Node update/delete tools require `confirmModifyCurrentPage=true` and do not run Google Flow, ChatGPT, GPT Image 2, or raw `/workflow/run`.
+
 `VEOGENIE_MCP_ALLOW_MEDIA_IMPORT=1` enables `attach_local_media_to_node`, which reads a local image path through the desktop app and attaches it to an existing `imageReference` node. The tool still requires `confirmImportLocalFile=true` and does not return media bytes/base64 through MCP.
 
 `VEOGENIE_MCP_ALLOW_PROJECT_EXPORT=1` enables `export_media_to_workspace`, which writes generated media into `<workspaceRoot>/render/`. The tool still requires `confirmWriteProjectRender=true`, an absolute `workspaceRoot`, and a media id from `get_media_album`; it does not accept media URLs/base64 through MCP and does not overwrite existing files unless `confirmOverwrite=true`.
@@ -139,7 +141,7 @@ VeoGenie results must be reported from the app state, not from a new image gener
 
 If the user wants files back in the project, Codex should export each verified `mediaId` with `export_media_to_workspace` after `project_export` is enabled, then report the exported file paths. MCP intentionally does not return media URLs or raw media payloads, so Codex should not display a separate generated preview as the VeoGenie output.
 
-When the user asks Codex to judge whether a result matches the original brief, Codex should use the result QA skill to export candidate media to `render/qa/<job-slug>/`, inspect the exported files when the environment supports that media type, score against the original brief, and retry the same node/group at most once with a targeted correction prompt if no candidate passes.
+When the user asks Codex to judge whether a result matches the original brief, Codex can use the result QA skill as an optional helper. Keep the report practical: say which app media ids were checked, what was exported, and what looked right or wrong when local inspection is available.
 
 ## Agent Instructions
 
@@ -147,11 +149,10 @@ This marketplace also includes repo-level instructions for agents:
 
 ```text
 AGENTS.md
-BUSINESS_RULES.md
 CLAUDE.md
 ```
 
-These files define the exact MCP permissions, workflow port rules, run/poll/album/export sequence, and result QA rules for Codex, Claude, and other repo-aware agents. They are exported to the marketplace root and also kept inside `plugins/veogenie`.
+These files are lightweight usage guides for Codex, Claude, and other repo-aware agents. They explain node roles, correct input routing, shared voice wiring for multiple video nodes, and the basic MCP workflow. They are exported to the marketplace root and also kept inside `plugins/veogenie`.
 
 ## Export From App Repo
 
@@ -180,7 +181,6 @@ That folder contains only:
 ```text
 .agents/plugins/marketplace.json
 AGENTS.md
-BUSINESS_RULES.md
 CLAUDE.md
 plugins/veogenie
 ```
@@ -191,7 +191,6 @@ The plugin folder contains:
 .codex-plugin/plugin.json
 .mcp.json
 AGENTS.md
-BUSINESS_RULES.md
 CLAUDE.md
 README.md
 PUBLICATION_CHECKLIST.md

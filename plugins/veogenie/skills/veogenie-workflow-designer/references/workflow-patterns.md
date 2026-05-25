@@ -17,6 +17,28 @@ Edges:
 
 Use this when the user asks for product photos, campaign key visuals, catalog images, or ad stills.
 
+## AI Assistant Prompt Writer
+
+Use this when the user wants AI to write or improve prompts before image/video generation.
+
+Nodes:
+
+- `textPrompt`: assistant instruction plus original brief.
+- Optional `imageReference`: product/person/style context for the assistant.
+- `aiAssistant`: writes final image prompt, video prompt, script, or prompt variants.
+- Downstream `imageGenerate` or `videoGenerate`.
+
+Edges:
+
+- `textPrompt:text -> aiAssistant:text`
+- Optional context: `imageReference:image -> aiAssistant:image`
+- Image prompt: `aiAssistant:text -> imageGenerate:text`
+- Video prompt/script: `aiAssistant:text -> videoGenerate:text`
+
+If the assistant returns several batch texts and the workflow should use one specific variant, connect `aiAssistant:assistant-text:N` to the downstream node. Otherwise use `aiAssistant:text` for the current selected assistant output.
+
+Do not connect assistant text to `frame-start`, `frame-end`, `video-reference-image`, or `video-voice-reference`.
+
 ## Product Video From Generated Image
 
 Nodes:
