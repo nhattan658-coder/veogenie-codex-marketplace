@@ -22,7 +22,7 @@ Before creating or appending a workflow:
 - Do not rely on default handle inference when the target is `videoGenerate`.
 - Treat `frame-start`, `frame-end`, `video-reference-image`, and `video-voice-reference` as different semantics.
 - Do not pass media URLs, data URLs, blob URLs, or base64 through recipe nodes.
-- Create empty `imageReference` nodes in recipes, then use `attach_local_media_to_node` only after the page/node exists and media import permission is enabled.
+- Create empty `imageReference` nodes in recipes, then use `attach_local_media_to_node` only after the page/node exists and media import permission is enabled. For user images supplied in chat, stage the attachment as a local workspace file first and use `attach_chat_image_to_node`.
 
 ## Canvas Write Flow
 

@@ -8,10 +8,11 @@ Follow `AGENTS.md` first. This file keeps the same guidance short for Claude-sty
 2. Ask for or use only the permissions needed for the user's requested action.
 3. Create or append workflow pages only when the user wants a workflow change.
 4. Edit existing node fields with `update_workflow_nodes` or delete active-page nodes with `delete_workflow_nodes` only when the user asks, `canvas_write` is enabled, and `confirmModifyCurrentPage=true` is present.
-5. Run nodes/groups with `run_node` or `run_group`.
-6. Poll with `get_run_orchestration_status`.
-7. Read final state with `get_node_outputs` and `get_media_album`.
-8. Export with `export_media_to_workspace` when the user wants files in the project.
+5. Attach user images with `attach_local_media_to_node`. For images provided in chat, stage the attachment as a local file under `workspaceRoot`, then call `attach_chat_image_to_node` with `confirmImportChatImage=true`.
+6. Run nodes/groups with `run_node` or `run_group`.
+7. Poll with `get_run_orchestration_status`.
+8. Read final state with `get_node_outputs` and `get_media_album`.
+9. Export with `export_media_to_workspace` when the user wants files in the project.
 
 `update_workflow_nodes` and `delete_workflow_nodes` do not run Google Flow, ChatGPT, GPT Image 2, or raw `/workflow/run`. Do not use them to edit generated output/status fields, delete pages, or delete media files.
 
@@ -59,3 +60,5 @@ Only wait when there is a real dependency: a downstream node must not run until 
 ## Result Handoff
 
 Report results from VeoGenie state, not from a separate chat-generated preview. Use media ids from `get_media_album`; if export succeeds, report the file paths.
+
+Chat-provided images are input references only after staging to a local file. Do not pass raw media, base64, data URLs, blob URLs, or remote URLs through MCP.

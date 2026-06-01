@@ -76,7 +76,7 @@ For a product image job:
 
 1. Create or plan a workflow with `build_product_ad_workflow_recipe` or `plan_product_ad_job`.
 2. Create a new page with `create_workflow_page`, or append only when the user wants the current page changed.
-3. Attach local product images with `attach_local_media_to_node`.
+3. Attach local product images with `attach_local_media_to_node`. If the user provided an image in the AI Agent chat, first stage that attachment as a local file under the workspace, then use `attach_chat_image_to_node` with `confirmImportChatImage=true`.
 4. Run `imageGenerate` nodes with `run_node` or run the whole group with `run_group`.
 5. Poll with `get_run_orchestration_status`.
 6. Read outputs with `get_node_outputs` and media metadata with `get_media_album`.
@@ -106,3 +106,5 @@ Example: if three `imageGenerate` nodes each use their own `textPrompt` and `ima
 ## Reporting
 
 When reporting results, use the app state from `get_node_outputs` and `get_media_album`. If files were exported, include the exported paths and media ids. If generation is still running or an export failed, report that state plainly.
+
+Chat-provided input images are allowed only after they have been staged as local files under `workspaceRoot`. Do not pass image bytes, base64, data URLs, blob URLs, or remote URLs through MCP, and do not report a chat image as a VeoGenie generated result.

@@ -12,7 +12,7 @@ Use this skill for product-focused creative work. Pair it with the core `veogeni
 ## Default Process
 
 1. Extract the product, audience, campaign goal, format, aspect ratio, and desired output count from the user's request.
-2. If a local product image path is provided, plan to use `imageReference` plus `attach_local_media_to_node` after the workflow page exists and media import permission is granted.
+2. If a local product image path is provided, plan to use `imageReference` plus `attach_local_media_to_node` after the workflow page exists and media import permission is granted. If the product image came from chat, stage it as a local workspace file first and use `attach_chat_image_to_node`.
 3. Prefer `plan_product_ad_job` for end-to-end planning and `build_product_ad_workflow_recipe` for recipe-only planning.
 4. Create or append a workflow only after the user asks for that action and canvas-write permission is available.
 5. Run image/video nodes only after the user asks to generate and action permission is available.

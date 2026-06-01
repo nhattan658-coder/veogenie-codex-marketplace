@@ -74,6 +74,7 @@ For several videos with the same voice, create one `voiceReference` node with an
 - `create_workflow_page`, `append_workflow_to_current_page`, `update_workflow_nodes`, `delete_workflow_nodes`, and `undo_last_mcp_canvas_write` require `VEOGENIE_MCP_ALLOW_CANVAS_WRITE=1` or session permission `canvas_write`, plus the tool-specific confirm fields.
 - `export_media` requires `VEOGENIE_MCP_ALLOW_MEDIA_EXPORT=1` or session permission `media_export`, plus `confirmOpenSaveDialog=true`.
 - `attach_local_media_to_node` requires `VEOGENIE_MCP_ALLOW_MEDIA_IMPORT=1` or session permission `media_import`, plus `confirmImportLocalFile=true`.
+- `attach_chat_image_to_node` requires `VEOGENIE_MCP_ALLOW_MEDIA_IMPORT=1` or session permission `media_import`, plus `confirmImportChatImage=true`; use it only after the agent has staged the user's chat image as a local file under `workspaceRoot`.
 - `export_media_to_workspace` requires `VEOGENIE_MCP_ALLOW_PROJECT_EXPORT=1` or session permission `project_export`, plus `confirmWriteProjectRender=true` and an absolute `workspaceRoot`; it only writes generated media into `<workspaceRoot>/render/`.
 - `run_workflow_payload` requires `VEOGENIE_MCP_ALLOW_RUN=1`.
 
@@ -90,5 +91,6 @@ For node/group runs, do not call `run_workflow_payload`; use `run_node` / `run_g
 - Use `delete_workflow_nodes` only when the user asked to remove nodes from the active page. It deletes connected edges and group children, but not pages or media files.
 - Do not pass media URLs, base64, data URLs, or blob URLs through MCP.
 - For local media import, pass only a local file path and let the desktop app read the file.
+- For chat-provided input images, save or stage the attachment as a local file in the workspace first, then call `attach_chat_image_to_node`; never pass raw chat media through MCP.
 - For desktop file export, the app must open a native save dialog before writing.
 - For project render export, use only `export_media_to_workspace` after the project export guard is enabled; never use it for arbitrary output paths outside `render/`.

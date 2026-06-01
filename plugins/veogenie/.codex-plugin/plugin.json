@@ -1,6 +1,6 @@
 {
   "name": "veogenie",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Connect Codex to the locally installed VeoGenie desktop app through MCP with basic workflow guidance for nodes, inputs, video prompts, and shared voice routing.",
   "author": {
     "name": "VeoGenie",
@@ -27,6 +27,7 @@
       "Check my open VeoGenie workflow.",
       "List VeoGenie pages and node counts.",
       "Read the current VeoGenie media album.",
+      "Attach a user chat image to a VeoGenie image reference node.",
       "Design a VeoGenie workflow with correct text, image, video, and voice ports.",
       "Connect one VeoGenie voice node to multiple video nodes."
     ],

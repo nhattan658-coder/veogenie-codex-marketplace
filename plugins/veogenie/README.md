@@ -131,7 +131,7 @@ Do not enable all guards by default.
 
 `VEOGENIE_MCP_ALLOW_CANVAS_WRITE=1` or session permission `canvas_write` enables guarded canvas writes. `create_workflow_page` creates a new page, `append_workflow_to_current_page` appends a recipe, `update_workflow_nodes` edits schema-safe fields on existing nodes, `delete_workflow_nodes` removes existing nodes and connected edges, and `undo_last_mcp_canvas_write` rolls back the latest MCP canvas write when the token still matches. Node update/delete tools require `confirmModifyCurrentPage=true` and do not run Google Flow, ChatGPT, GPT Image 2, or raw `/workflow/run`.
 
-`VEOGENIE_MCP_ALLOW_MEDIA_IMPORT=1` enables `attach_local_media_to_node`, which reads a local image path through the desktop app and attaches it to an existing `imageReference` node. The tool still requires `confirmImportLocalFile=true` and does not return media bytes/base64 through MCP.
+`VEOGENIE_MCP_ALLOW_MEDIA_IMPORT=1` enables `attach_local_media_to_node`, which reads a local image path through the desktop app and attaches it to an existing `imageReference` node. It also enables `attach_chat_image_to_node` for user images from the AI Agent chat after the agent has staged the attachment as a local file under `workspaceRoot`. These tools still require their confirm flags and do not accept or return media bytes/base64/data URLs/blob URLs through MCP.
 
 `VEOGENIE_MCP_ALLOW_PROJECT_EXPORT=1` enables `export_media_to_workspace`, which writes generated media into `<workspaceRoot>/render/`. The tool still requires `confirmWriteProjectRender=true`, an absolute `workspaceRoot`, and a media id from `get_media_album`; it does not accept media URLs/base64 through MCP and does not overwrite existing files unless `confirmOverwrite=true`.
 
