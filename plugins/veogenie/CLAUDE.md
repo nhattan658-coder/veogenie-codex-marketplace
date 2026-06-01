@@ -53,6 +53,10 @@ voiceReference:voice -> videoGenerate:video-voice-reference
 
 Use `frame-start` for the first frame, `frame-end` for the last frame, and `video-reference-image` for product/style/character references.
 
+If the user asks for a video from frames or keyframes, route images to `frame-start` and optionally `frame-end`; do not also route those frame images to `video-reference-image`, and do not add voice unless requested.
+
+If the user asks for synchronized voice, narration, or shared speaker voice, route image inputs to `video-reference-image` and route the voice to `video-voice-reference`. Use `frame-start`/`frame-end` only when the user explicitly asks for exact first/last frames.
+
 ## Shared Voice
 
 For many videos with the same narration voice, create one `voiceReference` node with an exact built-in preset name and connect it to every `videoGenerate:video-voice-reference` input. Keep each video's prompt and frame inputs separate unless the user wants them shared too.

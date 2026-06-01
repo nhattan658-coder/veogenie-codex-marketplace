@@ -124,6 +124,7 @@ enabled = true
 - Keep `run_workflow_payload` env-only via `VEOGENIE_MCP_ALLOW_RUN=1`; do not allow session grants for raw workflow payloads.
 - Document guarded tools as opt-in only.
 - Keep `AGENTS.md` and `CLAUDE.md` short and practical: node roles, correct input routing, shared voice wiring, basic run/poll/export flow.
+- Document video routing intent: frame/keyframe requests use `frame-start`/`frame-end`; synchronized voice/narration requests use `video-reference-image` plus `video-voice-reference` unless exact first/last frames are explicitly requested.
 - Document result handoff simply: Codex should read `get_node_outputs` and node-specific `get_media_album`, then export `mediaId` values if files are needed.
 - Document project-memory behavior without enabling silent writes: agents may update the user's `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, or `BUSINESS_RULES.md` only after explicit feedback/approval.
 - Do not include source app code, license issuer/private key, admin routes, media payloads, or customer data in the public plugin repository.

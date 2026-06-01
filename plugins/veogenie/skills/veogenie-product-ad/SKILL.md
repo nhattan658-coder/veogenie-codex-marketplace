@@ -73,6 +73,12 @@ Wire the result through the workflow designer contract:
 - `aiAssistant:text -> videoGenerate:text` for generated video prompts/scripts.
 - Use `aiAssistant:assistant-text:N` only when selecting one specific batch variant.
 
+For product video wiring, follow the workflow designer intent contract:
+
+- If the user asks for a product video from an exact frame/keyframe, connect that image to `videoGenerate:frame-start` and an optional ending image to `videoGenerate:frame-end`; do not duplicate those frame images into `video-reference-image`.
+- If the user asks for synchronized voice, narration, or shared speaker voice, connect product/style/person images to `videoGenerate:video-reference-image` by default and connect `voiceReference:voice -> videoGenerate:video-voice-reference`.
+- Use `frame-start`/`frame-end` in a voice workflow only when the user explicitly asks for exact first/last frames.
+
 After running `aiAssistant`, verify its text output with `get_node_outputs` before running downstream image/video nodes. If the assistant output is vague, asks for visible text unintentionally, or drops product identity constraints, update the assistant instruction and rerun only after no command is queued/running.
 
 ## References

@@ -60,6 +60,8 @@ The plugin includes several skills for AI Agent work:
 
 For workflow authoring, the agent should read the workflow designer port contract before writing canvas recipes. Voice input must use `voiceReference:voice -> videoGenerate:video-voice-reference`; if a human is connecting manually and the voice port is not visible, switch `Tao Video` to component/input view before connecting voice.
 
+Video image routing must follow user intent. If the user asks to make a video from frames or keyframes, use `frame-start` and optional `frame-end`, and do not also put those frame images into `video-reference-image`. If the user asks for synchronized voice or narration, put image inputs into `video-reference-image` by default and connect the voice to `video-voice-reference`; only use `frame-start`/`frame-end` when exact first/last frames are explicitly requested.
+
 ## Optional Guards
 
 The default plugin remains read-only. For normal Codex chat usage, prefer temporary session permissions instead of asking the user to set PowerShell environment variables.

@@ -21,6 +21,8 @@ Before creating or appending a workflow:
 - Always set explicit `sourceHandle` and `targetHandle` on every recipe edge.
 - Do not rely on default handle inference when the target is `videoGenerate`.
 - Treat `frame-start`, `frame-end`, `video-reference-image`, and `video-voice-reference` as different semantics.
+- If the user asks to make a video from frames/keyframes, connect the images to `frame-start` and optionally `frame-end`; do not also connect those frame images to `video-reference-image`, and do not add voice unless requested.
+- If the user asks for synchronized narration/voice with image inputs, connect all image inputs to `video-reference-image` and connect the voice to `video-voice-reference`; use `frame-start`/`frame-end` only if the user explicitly asks for exact first/last frames.
 - Do not pass media URLs, data URLs, blob URLs, or base64 through recipe nodes.
 - Create empty `imageReference` nodes in recipes, then use `attach_local_media_to_node` only after the page/node exists and media import permission is enabled. For user images supplied in chat, stage the attachment as a local workspace file first and use `attach_chat_image_to_node`.
 

@@ -67,6 +67,10 @@ Choose the video image port by meaning:
 - `frame-end`: the image should be the last frame.
 - `video-reference-image`: the image is a style/product/character/reference image, not a strict first or last frame.
 
+For "make a video from this frame/keyframe" requests, connect the provided frame image to `frame-start`, and connect a second ending frame to `frame-end` when provided. Do not also connect those frame images to `video-reference-image`, and do not add voice unless the user asked for voice.
+
+For synchronized voice, narration, or shared speaker voice requests, connect every visual image input to `video-reference-image` by default and connect the `voiceReference` node to `video-voice-reference`. Use `frame-start` or `frame-end` in the same workflow only when the user explicitly asks for exact first or last frames.
+
 ## One Voice For Multiple Videos
 
 To keep several videos on the same voice:

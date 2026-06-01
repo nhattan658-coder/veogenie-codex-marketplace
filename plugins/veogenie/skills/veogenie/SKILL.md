@@ -50,6 +50,10 @@ imageReference:image -> videoGenerate:video-reference-image
 voiceReference:voice -> videoGenerate:video-voice-reference
 ```
 
+For video-from-frame/keyframe requests, route images to `frame-start` and optional `frame-end`; do not also route the same frame images to `video-reference-image`.
+
+For synchronized voice or narration requests, route visual image inputs to `video-reference-image` and route the voice to `video-voice-reference`. Use frame ports in that workflow only when the user explicitly asked for exact first/last frames.
+
 For several videos with the same voice, create one `voiceReference` node with an exact built-in preset name and connect it to each `videoGenerate:video-voice-reference` input.
 
 ## Result Handoff

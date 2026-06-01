@@ -67,18 +67,34 @@ Edges:
 
 Do not put all images into `frame-start`.
 
+## Video From Frames Or Keyframes
+
+Use this when the user asks for a video from one or two specific frames, keyframes, start/end frames, or a storyboard frame.
+
+Edges:
+
+- Prompt: `textPrompt:text -> videoGenerate:text`
+- One exact opening frame: `imageReference:image -> videoGenerate:frame-start` or `imageGenerate:image -> videoGenerate:frame-start`
+- Optional exact ending frame: `imageReference:image -> videoGenerate:frame-end` or `imageGenerate:image -> videoGenerate:frame-end`
+
+Do not connect the same frame image to `video-reference-image`. Do not connect a voice node unless the user asked for voice or narration.
+
 ## Video With Voice
 
 Nodes:
 
 - `textPrompt` or `aiAssistant` for the spoken/video prompt.
+- Optional `imageReference` or upstream `imageGenerate` outputs as visual references.
 - `voiceReference` for the selected voice.
 - `videoGenerate`.
 
 Edges:
 
 - `textPrompt:text -> videoGenerate:text` or `aiAssistant:text -> videoGenerate:text`
+- Image inputs for voice-synced/narrated videos: `imageReference:image -> videoGenerate:video-reference-image` or `imageGenerate:image -> videoGenerate:video-reference-image`
 - `voiceReference:voice -> videoGenerate:video-voice-reference`
+
+When the user asks for synchronized voice or narration, route all image inputs to `video-reference-image` by default. Use `frame-start` or `frame-end` only if the user explicitly asks for exact first/last frames.
 
 If using the UI manually and the voice port is not visible, switch `Tao Video` to component/input view before connecting.
 

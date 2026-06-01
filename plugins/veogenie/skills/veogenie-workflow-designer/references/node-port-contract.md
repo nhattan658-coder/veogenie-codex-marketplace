@@ -64,6 +64,30 @@ Use these target handles exactly:
 
 Do not confuse `frame-start`, `frame-end`, and `video-reference-image`.
 
+## Video Image Routing By User Intent
+
+Choose video image ports from the user's wording, not from convenience.
+
+### Video From Frames Or Keyframes
+
+Use this when the user says the video should be made from a frame, first frame, last frame, start/end frame, storyboard frame, or exact keyframe.
+
+- One image that should open the video: `imageReference:image -> videoGenerate:frame-start` or `imageGenerate:image -> videoGenerate:frame-start`.
+- Two images that define the start and ending: first image -> `frame-start`, second image -> `frame-end`.
+- Do not also connect those frame images to `video-reference-image`.
+- Do not add `video-voice-reference` unless the user asked for narration, voice, speaker, or synchronized voice.
+
+### Video With Synchronized Voice Or Narration
+
+Use this when the user asks for voice sync, narration, spoken line, speaker voice, consistent voice, or one voice shared across videos.
+
+- Connect the voice node as `voiceReference:voice -> videoGenerate:video-voice-reference`.
+- Connect image inputs as `imageReference:image -> videoGenerate:video-reference-image` or `imageGenerate:image -> videoGenerate:video-reference-image`.
+- Do not place all images into `frame-start`/`frame-end` just because they are images.
+- Use `frame-start` or `frame-end` in a voice workflow only when the user explicitly says an image must be the exact first or last frame.
+
+If the request includes both exact frames and voice, use both contracts: exact frame images go to `frame-start`/`frame-end`, other visual references go to `video-reference-image`, and the voice goes to `video-voice-reference`.
+
 ## Common Valid Edges
 
 ```json
@@ -142,6 +166,8 @@ Before calling `create_workflow_page` or `append_workflow_to_current_page`:
 - Every edge has `sourceHandle`.
 - Every edge has `targetHandle`.
 - Voice edges target only `video-voice-reference`.
+- A "video from frame/keyframe" request uses `frame-start`/`frame-end`, not `video-reference-image`, unless the user separately asks for reference images.
+- A "voice sync/narration" request routes image inputs to `video-reference-image` plus `voiceReference:voice -> video-voice-reference`, unless the user explicitly asks for exact first/last frames.
 - Video reference image edges target `video-reference-image`, not `frame-start`, unless the image is explicitly the first frame.
 - Start and end frames are assigned deliberately.
 - Recipe does not include raw media payloads.

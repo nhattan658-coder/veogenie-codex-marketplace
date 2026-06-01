@@ -36,12 +36,12 @@ When using MCP recipes:
 
 Preset voices already listed in the `Giong Noi` node, such as Gemini/Flow preset names, should be connected as `voiceReference`.
 
-Current automation behavior:
+Graph behavior:
 
-- Preset voices are sent as a video prompt hint because the current Flow picker may not render a usable `Giong noi` tab for those presets.
-- The backend logs this path as `voice-preset-prompt-hint`.
 - The graph edge is still `voiceReference:voice -> videoGenerate:video-voice-reference`.
 - For MCP-authored workflows, `voiceName` must be an exact built-in preset name. Do not use descriptive text such as "young soft female voice" as `voiceName`; put that in `voiceDescription`.
+- When voice or narration sync is requested, image inputs should normally connect to `video-reference-image` while the voice connects to `video-voice-reference`.
+- Do not connect voice to text, frame, or image reference ports as a fallback.
 
 ## Custom Or Saved Flow Voices
 
