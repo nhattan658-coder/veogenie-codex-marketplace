@@ -16,6 +16,12 @@ Follow `AGENTS.md` first. This file keeps the same guidance short for Claude-sty
 
 `update_workflow_nodes` and `delete_workflow_nodes` do not run Google Flow, ChatGPT, GPT Image 2, or raw `/workflow/run`. Do not use them to edit generated output/status fields, delete pages, or delete media files.
 
+## Project Memory
+
+When the user explicitly says a VeoGenie result or process is right/wrong and asks to remember it, use `veogenie-project-memory` to update project memory files. Prefer existing `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, and `BUSINESS_RULES.md`; create missing files only after the user approved the memory update.
+
+Store only durable rules: agent process in `AGENTS.md`, short companion guidance in `CLAUDE.md`, visual/style preferences in `DESIGN.md`, and domain or must-not-repeat rules in `BUSINESS_RULES.md`. Do not write raw media, base64, private data, or temporary paths. Do not update memory silently after every run.
+
 ## Node Roles
 
 - `textPrompt`: prompt text.

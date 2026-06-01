@@ -28,6 +28,7 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 - Use `veogenie-video-director` when writing video prompts, spoken lines, voice tone, camera direction, or model-aware video instructions.
 - Use `veogenie-product-ad` when planning product image/video ad workflows.
 - Use `veogenie-result-qa` when the user asks to inspect generated results or export files.
+- Use `veogenie-project-memory` when the user says a VeoGenie result or workflow was right/wrong and asks the agent to remember, avoid, apply next time, or update project rules.
 
 Common node roles:
 
@@ -94,3 +95,4 @@ For node/group runs, do not call `run_workflow_payload`; use `run_node` / `run_g
 - For chat-provided input images, save or stage the attachment as a local file in the workspace first, then call `attach_chat_image_to_node`; never pass raw chat media through MCP.
 - For desktop file export, the app must open a native save dialog before writing.
 - For project render export, use only `export_media_to_workspace` after the project export guard is enabled; never use it for arbitrary output paths outside `render/`.
+- Do not silently update the user's `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, or `BUSINESS_RULES.md` after every run. Update project memory only after explicit user feedback or approval.

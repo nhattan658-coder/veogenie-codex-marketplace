@@ -15,6 +15,19 @@ Use write/run/export tools only when the user asks for that action and grants th
 
 Canvas mutation tools still go through the desktop app command queue. `update_workflow_nodes` may edit only schema-safe node fields such as title, prompt, model, aspect ratio, result count, duration, position, size, and voice metadata. `delete_workflow_nodes` may remove nodes from the active page and connected edges; deleting a group also removes child nodes. These tools require `canvas_write` plus `confirmModifyCurrentPage=true`, return a rollback token, and must not be used to run Google Flow, ChatGPT, GPT Image 2, delete pages, delete media, or edit generated output/status fields.
 
+## Project Memory From Feedback
+
+When the user says a VeoGenie result, workflow, prompt, or design is right or wrong and asks to remember it, update the user's project memory files instead of relying on chat history.
+
+Use `veogenie-project-memory` for this work. Prefer existing files and create missing files only when the user approved the memory update:
+
+- `AGENTS.md`: agent process and workflow rules for the user's project.
+- `CLAUDE.md`: short companion rules for Claude-style agents.
+- `DESIGN.md`: visual style, brand direction, prompt style, approved and rejected looks.
+- `BUSINESS_RULES.md`: durable domain rules, product constraints, and must-not-repeat mistakes.
+
+Do not update these files silently after every run. Only store durable guidance from explicit feedback such as "remember this", "next time do this", "this is correct", or "do not do this again". Keep entries concise, avoid raw media/base64/private data, preserve existing content, and report which files changed.
+
 ## Node Basics
 
 - `textPrompt`: stores text instructions. Connect it to image/video/assistant nodes when the prompt should drive generation.

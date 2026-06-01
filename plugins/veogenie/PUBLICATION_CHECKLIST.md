@@ -64,6 +64,7 @@ skills/veogenie-workflow-designer
 skills/veogenie-product-ad
 skills/veogenie-video-director
 skills/veogenie-result-qa
+skills/veogenie-project-memory
 ```
 
 The result QA skill must include:
@@ -124,6 +125,7 @@ enabled = true
 - Document guarded tools as opt-in only.
 - Keep `AGENTS.md` and `CLAUDE.md` short and practical: node roles, correct input routing, shared voice wiring, basic run/poll/export flow.
 - Document result handoff simply: Codex should read `get_node_outputs` and node-specific `get_media_album`, then export `mediaId` values if files are needed.
+- Document project-memory behavior without enabling silent writes: agents may update the user's `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, or `BUSINESS_RULES.md` only after explicit feedback/approval.
 - Do not include source app code, license issuer/private key, admin routes, media payloads, or customer data in the public plugin repository.
 
 ## Smoke Test

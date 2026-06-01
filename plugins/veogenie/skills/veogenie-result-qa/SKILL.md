@@ -39,6 +39,8 @@ When semantic QA is requested:
 
 Do not claim visual QA was performed for a video if the environment could not inspect video frames or playback.
 
+If the user confirms that a result is correct and asks to remember the direction, or says the result is wrong and asks not to repeat the mistake, use `veogenie-project-memory` after QA. Store only durable guidance, not transient run details.
+
 ## Reporting
 
 Report:

@@ -56,6 +56,7 @@ The plugin includes several skills for AI Agent work:
 - `veogenie-product-ad`: product image/video ad briefs, prompt standards, and product fidelity checks.
 - `veogenie-video-director`: high-quality video prompt/script direction for Google Flow.
 - `veogenie-result-qa`: optional output checking and export handoff when the user asks to inspect or save generated results.
+- `veogenie-project-memory`: update the user's project memory files after explicit right/wrong feedback so future agents keep durable preferences and avoid repeated mistakes.
 
 For workflow authoring, the agent should read the workflow designer port contract before writing canvas recipes. Voice input must use `voiceReference:voice -> videoGenerate:video-voice-reference`; if a human is connecting manually and the voice port is not visible, switch `Tao Video` to component/input view before connecting voice.
 
@@ -143,6 +144,19 @@ If the user wants files back in the project, Codex should export each verified `
 
 When the user asks Codex to judge whether a result matches the original brief, Codex can use the result QA skill as an optional helper. Keep the report practical: say which app media ids were checked, what was exported, and what looked right or wrong when local inspection is available.
 
+## Project Memory From Feedback
+
+After a VeoGenie task, Codex should not rely on chat history alone for durable user preferences. When the user explicitly says a result, prompt, workflow, or design was right or wrong and asks to remember or apply it next time, use the `veogenie-project-memory` skill.
+
+Project memory updates should target the user's project, not the VeoGenie plugin repository:
+
+- `AGENTS.md` for agent process and workflow rules.
+- `CLAUDE.md` for short companion guidance.
+- `DESIGN.md` for visual style, brand direction, prompt style, and approved/rejected looks.
+- `BUSINESS_RULES.md` for durable domain rules, constraints, and mistakes that must not repeat.
+
+Do not update these files silently after every run. Ask when feedback is ambiguous, preserve existing content, keep entries concise, avoid raw media/base64/private data, and report exactly which files changed.
+
 ## Agent Instructions
 
 This marketplace also includes repo-level instructions for agents:
@@ -202,6 +216,7 @@ skills/veogenie-workflow-designer/SKILL.md
 skills/veogenie-product-ad/SKILL.md
 skills/veogenie-video-director/SKILL.md
 skills/veogenie-result-qa/SKILL.md
+skills/veogenie-project-memory/SKILL.md
 skills/veogenie-result-qa/references/semantic-result-qa.md
 ```
 
@@ -246,5 +261,6 @@ Use the VeoGenie MCP plugin to check the open desktop app:
 4. Call get_current_workflow and report the active page node/edge count.
 5. Optionally read the workflow designer skill and confirm that voice input uses video-voice-reference.
 6. Optionally call build_product_ad_workflow_recipe for a sample product brief and confirm it only returns a recipe.
+7. Optionally read the project memory skill and explain when it should update AGENTS.md, CLAUDE.md, DESIGN.md, or BUSINESS_RULES.md.
 Do not run Google Flow, ChatGPT, GPT Image 2, create/append pages, import media, export files, run_node, run_group, or run_workflow_payload.
 ```
