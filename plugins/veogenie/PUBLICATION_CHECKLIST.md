@@ -5,9 +5,11 @@ Use this checklist before copying this plugin into a public repository.
 ## App Release
 
 - Build and publish a VeoGenie Tool installer that includes:
-  - `D:\VeoGenie Tool\veogenie-mcp.cmd`
-  - `D:\VeoGenie Tool\runtime\mcp-server\index.mjs`
-  - `D:\VeoGenie Tool\runtime\node\node.exe`
+  - root `veogenie-mcp.cmd` in the selected install directory
+  - `runtime\mcp-server\index.mjs` in the selected install directory
+  - `runtime\node\node.exe` in the selected install directory
+- The public plugin must use `bin\veogenie-mcp-launcher.cmd`; it must not hard-code `C:`, `D:`, or `E:` in `.mcp.json`.
+- If the user installs VeoGenie into a custom directory outside the common install paths, document `VEOGENIE_MCP_LAUNCHER=<full path to veogenie-mcp.cmd>` or create a stable launcher at `%LOCALAPPDATA%\VeoGenie\veogenie-mcp.cmd`.
 - Install the release build on a clean Windows machine or VM.
 - Open the desktop app and verify:
 
@@ -69,6 +71,12 @@ skills/veogenie-product-ad
 skills/veogenie-video-director
 skills/veogenie-result-qa
 skills/veogenie-project-memory
+```
+
+The plugin launcher resolver must be present before export:
+
+```text
+bin/veogenie-mcp-launcher.cmd
 ```
 
 The result QA skill must include:

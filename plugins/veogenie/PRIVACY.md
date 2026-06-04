@@ -1,6 +1,6 @@
 # VeoGenie Codex Plugin Privacy
 
-The VeoGenie Codex plugin connects Codex to the locally installed VeoGenie desktop app through the bundled MCP launcher at `D:\VeoGenie Tool\veogenie-mcp.cmd`.
+The VeoGenie Codex plugin connects Codex to the locally installed VeoGenie desktop app through a plugin-bundled launcher resolver. The resolver finds the installed `veogenie-mcp.cmd` without assuming a fixed install drive.
 
 By default, the plugin only reads sanitized workflow state from the local backend at `http://127.0.0.1:8788`. Read-only tools do not return raw media URLs, data URLs, base64 payloads, license issuer data, private keys, or customer source files.
 

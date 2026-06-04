@@ -20,13 +20,22 @@ The expected response is:
 
 ## MCP Launcher
 
-The plugin expects the installed app to provide:
+The plugin starts a bundled resolver:
 
 ```text
-D:\VeoGenie Tool\veogenie-mcp.cmd
+plugins/veogenie/bin/veogenie-mcp-launcher.cmd
 ```
 
-The launcher starts the MCP server bundled with the desktop app and connects to:
+The resolver then finds the installed app launcher without assuming a fixed drive. It checks, in order:
+
+- `VEOGENIE_MCP_LAUNCHER` when set to a full launcher path.
+- `%LOCALAPPDATA%\VeoGenie\veogenie-mcp.cmd`
+- `%ProgramData%\VeoGenie\veogenie-mcp.cmd`
+- common install paths under `%LOCALAPPDATA%\Programs`, `%ProgramFiles%`, `%ProgramFiles(x86)%`, `C:\`, `D:\`, and `E:\`.
+
+On Windows, the desktop app also writes `%LOCALAPPDATA%\VeoGenie\veogenie-mcp.cmd` on startup when the installed root launcher exists, so custom install directories can still be resolved after the user opens the app once.
+
+The installed app launcher starts the MCP server bundled with the desktop app and connects to:
 
 ```text
 http://127.0.0.1:8788
@@ -218,6 +227,7 @@ The plugin folder contains:
 ```text
 .codex-plugin/plugin.json
 .mcp.json
+bin/veogenie-mcp-launcher.cmd
 AGENTS.md
 CLAUDE.md
 README.md

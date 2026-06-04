@@ -1,7 +1,7 @@
 {
   "name": "veogenie",
-  "version": "0.1.13",
-  "description": "Connect Codex to the locally installed VeoGenie desktop app through MCP with workflow guidance for nodes, model choice, image-first video inputs, continuity assets, viral video scripts, video prompts, and shared voice routing.",
+  "version": "0.1.14",
+  "description": "Connect Codex to the locally installed VeoGenie desktop app through a drive-independent MCP launcher with workflow guidance for nodes, model choice, image-first video inputs, continuity assets, viral video scripts, video prompts, and shared voice routing.",
   "author": {
     "name": "VeoGenie",
     "email": "nhattan658-coder@users.noreply.github.com",
@@ -16,7 +16,7 @@
   "interface": {
     "displayName": "VeoGenie",
     "shortDescription": "Use the local VeoGenie desktop app from Codex.",
-    "longDescription": "Adds MCP tools and lightweight agent guides for the locally installed VeoGenie desktop app. Codex can inspect pages, understand node roles, choose suitable image/video models, plan image-first video workflows with minimal necessary references, plan reusable continuity assets before video generation, write hook-driven viral-style scripts, split scripts into multi-scene video workflows, connect text, image, video, and voice inputs correctly, reuse one voice across multiple video nodes, write video prompts, and export generated media when the user enables the matching permission. The default configuration is read-only and connects through the app's installed veogenie-mcp.cmd launcher.",
+    "longDescription": "Adds MCP tools and lightweight agent guides for the locally installed VeoGenie desktop app. Codex can inspect pages, understand node roles, choose suitable image/video models, plan image-first video workflows with minimal necessary references, plan reusable continuity assets before video generation, write hook-driven viral-style scripts, split scripts into multi-scene video workflows, connect text, image, video, and voice inputs correctly, reuse one voice across multiple video nodes, write video prompts, and export generated media when the user enables the matching permission. The default configuration is read-only and connects through a plugin-bundled launcher that resolves the installed app launcher without assuming a fixed C:, D:, or E: drive.",
     "developerName": "VeoGenie",
     "category": "Productivity",
     "capabilities": ["Interactive", "Read"],

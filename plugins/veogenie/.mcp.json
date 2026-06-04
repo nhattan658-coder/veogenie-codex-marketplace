@@ -1,7 +1,13 @@
 {
   "mcpServers": {
     "veogenie": {
-      "command": "D:\\VeoGenie Tool\\veogenie-mcp.cmd",
+      "cwd": ".",
+      "command": "cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "bin\\veogenie-mcp-launcher.cmd"
+      ],
       "env": {
         "VEOGENIE_WORKFLOW_BACKEND_URL": "http://127.0.0.1:8788"
       }

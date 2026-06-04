@@ -9,7 +9,7 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 
 - The user must install and open the VeoGenie desktop app.
 - The local backend should answer `http://127.0.0.1:8788/health`.
-- The installed MCP launcher should exist at `D:\VeoGenie Tool\veogenie-mcp.cmd`.
+- The plugin starts `bin\veogenie-mcp-launcher.cmd`, which resolves the installed `veogenie-mcp.cmd` from stable user paths, common install paths, or `VEOGENIE_MCP_LAUNCHER`.
 
 ## Basic Flow
 
