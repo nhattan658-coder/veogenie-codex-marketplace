@@ -53,6 +53,10 @@ The plugin includes several skills for AI Agent work:
 
 - `veogenie`: safe MCP startup, permissions, run/poll, and result handoff.
 - `veogenie-workflow-designer`: workflow recipe design, explicit edge handles, and correct text/image/video/voice port routing.
+- `veogenie-model-selector`: choose image/video models, provider, resolution, aspect ratio, and duration for output nodes.
+- `veogenie-image-to-video-input-planner`: decide when to generate an image before video, choose minimal video inputs, and omit redundant references that would confuse image/video models.
+- `veogenie-continuity-asset-planner`: plan missing characters, wardrobe, props/products, locations, style refs, and voice inputs that must exist before video generation.
+- `veogenie-viral-video-producer`: create hook-driven short-form scripts, natural dialogue, and ordered multi-scene video workflows.
 - `veogenie-product-ad`: product image/video ad briefs, prompt standards, and product fidelity checks.
 - `veogenie-video-director`: high-quality video prompt/script direction for Google Flow.
 - `veogenie-result-qa`: optional output checking and export handoff when the user asks to inspect or save generated results.
@@ -61,6 +65,14 @@ The plugin includes several skills for AI Agent work:
 For workflow authoring, the agent should read the workflow designer port contract before writing canvas recipes. Voice input must use `voiceReference:voice -> videoGenerate:video-voice-reference`; if a human is connecting manually and the voice port is not visible, switch `Tao Video` to component/input view before connecting voice.
 
 Video image routing must follow user intent. If the user asks to make a video from frames or keyframes, use `frame-start` and optional `frame-end`, and do not also put those frame images into `video-reference-image`. If the user asks for synchronized voice or narration, put image inputs into `video-reference-image` by default and connect the voice to `video-voice-reference`; only use `frame-start`/`frame-end` when exact first/last frames are explicitly requested.
+
+Model choice should follow `veogenie-model-selector`: GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, and Veo 3.1 models for normal video.
+
+For image-first video workflows, use `veogenie-image-to-video-input-planner` before wiring `videoGenerate`. Fashion video should usually generate the final fashion still/look first, then pass only the useful anchor image and necessary identity refs into the video node. If the generated fashion image already contains the outfit clearly, omit separate clothing/wardrobe refs from `videoGenerate`.
+
+For multi-scene videos, use `veogenie-continuity-asset-planner` before running `videoGenerate` nodes when the script has missing or recurring characters, products, props, wardrobe, locations, or style references. If the user supplies only one main character but the script adds other important characters, the agent should create those character reference images first, then route the finished assets to each relevant scene through `video-reference-image`.
+
+For viral-style short videos, use `veogenie-viral-video-producer` to write the hook, beat sheet, natural dialogue, scene plan, and ordered `videoGenerate` clip workflow. Unless MCP capabilities include a verified merge/stitch tool, report the result as ordered exported clips, not one final combined video file.
 
 ## Optional Guards
 
@@ -215,6 +227,17 @@ TERMS.md
 LICENSE.md
 skills/veogenie/SKILL.md
 skills/veogenie-workflow-designer/SKILL.md
+skills/veogenie-model-selector/SKILL.md
+skills/veogenie-image-to-video-input-planner/SKILL.md
+skills/veogenie-image-to-video-input-planner/references/minimal-video-input-routing.md
+skills/veogenie-image-to-video-input-planner/references/image-first-patterns.md
+skills/veogenie-continuity-asset-planner/SKILL.md
+skills/veogenie-continuity-asset-planner/references/continuity-asset-manifest.md
+skills/veogenie-continuity-asset-planner/references/preproduction-workflow-patterns.md
+skills/veogenie-viral-video-producer/SKILL.md
+skills/veogenie-viral-video-producer/references/viral-script-structures.md
+skills/veogenie-viral-video-producer/references/natural-dialogue-rubric.md
+skills/veogenie-viral-video-producer/references/multi-scene-workflow-patterns.md
 skills/veogenie-product-ad/SKILL.md
 skills/veogenie-video-director/SKILL.md
 skills/veogenie-result-qa/SKILL.md

@@ -16,6 +16,14 @@ Follow `AGENTS.md` first. This file keeps the same guidance short for Claude-sty
 
 `update_workflow_nodes` and `delete_workflow_nodes` do not run Google Flow, ChatGPT, GPT Image 2, or raw `/workflow/run`. Do not use them to edit generated output/status fields, delete pages, or delete media files.
 
+Use `veogenie-model-selector` before choosing or updating model settings. Prefer GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, and Veo 3.1 models for normal video.
+
+Use `veogenie-image-to-video-input-planner` when a video should be created from a generated still, fashion look, product hero, storyboard frame, or exact visual anchor. Generate the anchor image first when it controls the look, then connect only necessary inputs to `videoGenerate`; omit redundant clothing/prop/style refs already visible in that anchor.
+
+Use `veogenie-continuity-asset-planner` before multi-scene videos when important characters, products, props, wardrobe, locations, or style references must stay consistent. If the script adds characters that were not supplied by the user, create those character reference images before scene videos and route them through `video-reference-image`.
+
+Use `veogenie-viral-video-producer` for hook-driven scripts, natural dialogue, and multi-scene short videos. Create one video node per scene and export ordered clips. Do not say the clips were merged into one final file unless a verified merge/stitch tool is available.
+
 ## Project Memory
 
 When the user explicitly says a VeoGenie result or process is right/wrong and asks to remember it, use `veogenie-project-memory` to update project memory files. Prefer existing `AGENTS.md`, `CLAUDE.md`, `DESIGN.md`, and `BUSINESS_RULES.md`; create missing files only after the user approved the memory update.

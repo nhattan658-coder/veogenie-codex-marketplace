@@ -13,8 +13,12 @@ Before creating or appending a workflow:
 
 1. Use the base `veogenie` skill to read app state.
 2. Read `references/node-port-contract.md`.
-3. If a voice input is involved, read `references/voice-connection-rules.md`.
-4. If the user asks for a full workflow pattern, read `references/workflow-patterns.md`.
+3. Use `veogenie-model-selector` when setting `model`, `provider`, `width`, `height`, `aspectRatio`, or `duration` on output nodes.
+4. Use `veogenie-viral-video-producer` when the workflow represents a multi-scene short, viral script, or ordered set of video clips.
+5. Use `veogenie-continuity-asset-planner` when the workflow has multiple characters, generated cast members, recurring props/products, wardrobe, locations, or style references that must stay consistent across video scenes.
+6. Use `veogenie-image-to-video-input-planner` when deciding whether to create upstream `imageGenerate` anchors before `videoGenerate`, or when pruning redundant image references from video inputs.
+7. If a voice input is involved, read `references/voice-connection-rules.md`.
+8. If the user asks for a full workflow pattern, read `references/workflow-patterns.md`.
 
 ## Recipe Rules
 
@@ -23,6 +27,8 @@ Before creating or appending a workflow:
 - Treat `frame-start`, `frame-end`, `video-reference-image`, and `video-voice-reference` as different semantics.
 - If the user asks to make a video from frames/keyframes, connect the images to `frame-start` and optionally `frame-end`; do not also connect those frame images to `video-reference-image`, and do not add voice unless requested.
 - If the user asks for synchronized narration/voice with image inputs, connect all image inputs to `video-reference-image` and connect the voice to `video-voice-reference`; use `frame-start`/`frame-end` only if the user explicitly asks for exact first/last frames.
+- For multi-scene videos, create upstream asset reference branches before scene video nodes when the script contains missing or recurring characters, wardrobe, props/products, or locations. Route those finished asset images to `video-reference-image` on every scene that needs them.
+- For image-first video, create the upstream `imageGenerate` anchor first, then connect only the minimal useful inputs to `videoGenerate`. Do not connect separate wardrobe/prop/style refs if the generated anchor image already contains those details clearly.
 - Do not pass media URLs, data URLs, blob URLs, or base64 through recipe nodes.
 - Create empty `imageReference` nodes in recipes, then use `attach_local_media_to_node` only after the page/node exists and media import permission is enabled. For user images supplied in chat, stage the attachment as a local workspace file first and use `attach_chat_image_to_node`.
 

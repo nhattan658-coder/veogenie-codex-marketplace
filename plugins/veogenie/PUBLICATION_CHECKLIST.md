@@ -61,6 +61,10 @@ Required skill folders must be present before export:
 ```text
 skills/veogenie
 skills/veogenie-workflow-designer
+skills/veogenie-model-selector
+skills/veogenie-image-to-video-input-planner
+skills/veogenie-continuity-asset-planner
+skills/veogenie-viral-video-producer
 skills/veogenie-product-ad
 skills/veogenie-video-director
 skills/veogenie-result-qa
@@ -72,6 +76,28 @@ The result QA skill must include:
 ```text
 skills/veogenie-result-qa/references/result-handoff-checklist.md
 skills/veogenie-result-qa/references/semantic-result-qa.md
+```
+
+The viral video producer skill must include:
+
+```text
+skills/veogenie-viral-video-producer/references/viral-script-structures.md
+skills/veogenie-viral-video-producer/references/natural-dialogue-rubric.md
+skills/veogenie-viral-video-producer/references/multi-scene-workflow-patterns.md
+```
+
+The continuity asset planner skill must include:
+
+```text
+skills/veogenie-continuity-asset-planner/references/continuity-asset-manifest.md
+skills/veogenie-continuity-asset-planner/references/preproduction-workflow-patterns.md
+```
+
+The image-to-video input planner skill must include:
+
+```text
+skills/veogenie-image-to-video-input-planner/references/minimal-video-input-routing.md
+skills/veogenie-image-to-video-input-planner/references/image-first-patterns.md
 ```
 
 `npm run plugin:export` rejects plugin metadata if any public plugin metadata file still contains local-test URLs.

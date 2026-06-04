@@ -7,16 +7,19 @@ description: Create high-quality VeoGenie product advertising workflows, prompts
 
 ## Scope
 
-Use this skill for product-focused creative work. Pair it with the core `veogenie` skill for MCP safety and with `veogenie-workflow-designer` when building or reviewing node structure.
+Use this skill for product-focused creative work. Pair it with the core `veogenie` skill for MCP safety, `veogenie-workflow-designer` when building or reviewing node structure, `veogenie-model-selector` when choosing image/video models or resolution, `veogenie-image-to-video-input-planner` when a hero image should be generated before product/fashion video or when video inputs need pruning, `veogenie-continuity-asset-planner` when products/props/people/locations must stay consistent across scenes, and `veogenie-viral-video-producer` when the ad needs a hook-driven multi-scene script.
 
 ## Default Process
 
 1. Extract the product, audience, campaign goal, format, aspect ratio, and desired output count from the user's request.
 2. If a local product image path is provided, plan to use `imageReference` plus `attach_local_media_to_node` after the workflow page exists and media import permission is granted. If the product image came from chat, stage it as a local workspace file first and use `attach_chat_image_to_node`.
 3. Prefer `plan_product_ad_job` for end-to-end planning and `build_product_ad_workflow_recipe` for recipe-only planning.
-4. Create or append a workflow only after the user asks for that action and canvas-write permission is available.
-5. Run image/video nodes only after the user asks to generate and action permission is available.
-6. Verify results with node-specific `get_node_outputs` and `get_media_album`; export only verified media ids.
+4. Choose output node models with `veogenie-model-selector`; high-quality product image renders should usually use Nano Banana Pro at `2K` or `4K`, while realistic storyboard/keyframe drafts should usually use GPT Image 2.
+5. For product or fashion video, prefer generating a strong hero image/look first, then feed only the necessary anchor/product/identity inputs into `videoGenerate`.
+6. For multi-scene ads, create a continuity asset manifest before video nodes. Generate or attach missing product variants, recurring props, wardrobe, presenters, or locations before running scene clips.
+7. Create or append a workflow only after the user asks for that action and canvas-write permission is available.
+8. Run image/video nodes only after the user asks to generate and action permission is available.
+9. Verify results with node-specific `get_node_outputs` and `get_media_album`; export only verified media ids.
 
 ## Brief Minimum
 
@@ -45,6 +48,7 @@ Use prompts that specify:
 
 - For image-only ads, use `imageReference` + `textPrompt` + `imageGenerate`.
 - For image and video, generate a strong hero frame first, then feed it into `videoGenerate`.
+- For fashion video, generate the final fashion still first; usually feed that still to `videoGenerate` and omit separate wardrobe references when the still already shows the outfit clearly.
 - Use `aiAssistant` when the brief needs script, shot list, caption copy, or multiple prompt variants.
 - Avoid `characterReference` / `Nhan Vat` while it is locked.
 

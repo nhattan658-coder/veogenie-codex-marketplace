@@ -54,6 +54,31 @@ Edges:
 
 Only connect the generated image to `video-reference-image` if the user wants it as a reference/component, not as the first frame.
 
+## Fashion Video From Generated Look
+
+Use `veogenie-image-to-video-input-planner` for fashion videos. Prefer creating the final fashion still/look before video.
+
+Nodes:
+
+- Optional `imageReference`: face/identity references or garment/product refs used only for upstream image creation.
+- `textPrompt`: fashion still prompt.
+- `imageGenerate`: creates the final fashion look/still.
+- `textPrompt`: video motion/camera prompt.
+- `videoGenerate`: creates the fashion video.
+
+Edges:
+
+- `textPrompt:text -> imageGenerate:text`
+- Optional creation refs: `imageReference:image -> imageGenerate:image`
+- Generated anchor: `imageGenerate:image -> videoGenerate:frame-start`
+- Video prompt: `textPrompt:text -> videoGenerate:text`
+
+Optional video refs:
+
+- `imageReference:image -> videoGenerate:video-reference-image` only for face/identity refs or product refs that add necessary information not already clear in the generated fashion still.
+
+Do not connect separate clothing/wardrobe references to `videoGenerate` when the generated fashion still already shows the final outfit clearly. This avoids making the video model mix the final look with redundant or competing garment refs.
+
 ## Product Video With Reference Images
 
 Use this when the user provides several product/person/style images.
@@ -103,3 +128,11 @@ If using the UI manually and the voice port is not visible, switch `Tao Video` t
 Use `resultCount` on `imageGenerate` or `videoGenerate` instead of cloning identical branches when the user wants variants from the same prompt and inputs.
 
 After running, verify count with `get_node_outputs` and node-specific `get_media_album`.
+
+## Viral Multi-Scene Short
+
+Use `veogenie-viral-video-producer` for hook-driven scripts, natural dialogue, scene splitting, and ordered clip export. Do not model separate story beats as `resultCount`; create separate `textPrompt` + `videoGenerate` pairs for each scene.
+
+Before creating scene video nodes, use `veogenie-continuity-asset-planner` when the script has missing or recurring characters, props/products, wardrobe, locations, or style references. Create the required pre-production `textPrompt` + `imageGenerate` asset branches first, then route finished asset images to each scene through `video-reference-image`.
+
+For any scene grounded by a generated still, use `veogenie-image-to-video-input-planner` to decide whether that still belongs on `frame-start` or `video-reference-image`, and to omit redundant refs that would confuse the video model.

@@ -25,6 +25,10 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 ## Node And Skill Helpers
 
 - Use `veogenie-workflow-designer` when creating or appending workflow recipes, choosing node types, or connecting text/image/video/voice ports. It contains the authoritative port contract for `frame-start`, `frame-end`, `video-reference-image`, and `video-voice-reference`.
+- Use `veogenie-model-selector` when choosing or updating model/provider/resolution/duration fields for `imageGenerate` or `videoGenerate` nodes.
+- Use `veogenie-viral-video-producer` when creating hook-driven scripts, natural dialogue, multi-scene video plans, or several `videoGenerate` clips that form one short-form story.
+- Use `veogenie-continuity-asset-planner` before multi-scene videos when the agent must create or route missing characters, wardrobe, props/products, locations, style references, or shared voice inputs before video generation.
+- Use `veogenie-image-to-video-input-planner` when deciding whether to create a generated image before video and which minimal image/voice inputs should feed `videoGenerate` without redundant references.
 - Use `veogenie-video-director` when writing video prompts, spoken lines, voice tone, camera direction, or model-aware video instructions.
 - Use `veogenie-product-ad` when planning product image/video ad workflows.
 - Use `veogenie-result-qa` when the user asks to inspect generated results or export files.

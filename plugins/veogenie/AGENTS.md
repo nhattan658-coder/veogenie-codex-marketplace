@@ -15,6 +15,14 @@ Use write/run/export tools only when the user asks for that action and grants th
 
 Canvas mutation tools still go through the desktop app command queue. `update_workflow_nodes` may edit only schema-safe node fields such as title, prompt, model, aspect ratio, result count, duration, position, size, and voice metadata. `delete_workflow_nodes` may remove nodes from the active page and connected edges; deleting a group also removes child nodes. These tools require `canvas_write` plus `confirmModifyCurrentPage=true`, return a rollback token, and must not be used to run Google Flow, ChatGPT, GPT Image 2, delete pages, delete media, or edit generated output/status fields.
 
+Use `veogenie-model-selector` before choosing or updating model settings on `imageGenerate` or `videoGenerate` nodes. Default guidance: GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, and Veo 3.1 models for normal video.
+
+Use `veogenie-image-to-video-input-planner` when a video should be grounded by a generated still, product hero, fashion look, storyboard frame, or exact visual anchor. Create the image first when it controls the final look, then connect only the minimal inputs to `videoGenerate`; omit redundant wardrobe/prop/style refs if the anchor image already contains them clearly.
+
+Use `veogenie-continuity-asset-planner` before multi-scene videos when the script has missing or recurring characters, wardrobe, props/products, locations, style refs, or shared voice inputs. If the user supplied only one character but the script adds other important characters, create those character reference images first, then route them to every relevant scene through `video-reference-image`.
+
+Use `veogenie-viral-video-producer` when the user wants a hook-driven short video, viral-style script, natural spoken dialogue, or multiple clips that form one story. Build one `videoGenerate` node per scene, keep dialogue human and speakable, connect one shared `voiceReference` to all scenes when voice consistency matters, and export clips in scene order. Do not claim VeoGenie produced one merged final video unless MCP capabilities expose a verified merge/stitch tool.
+
 ## Project Memory From Feedback
 
 When the user says a VeoGenie result, workflow, prompt, or design is right or wrong and asks to remember it, update the user's project memory files instead of relying on chat history.
@@ -102,10 +110,12 @@ For a product image job:
 For a video job:
 
 1. Connect text into `videoGenerate:text`.
-2. Connect start/end frames only when the user wants exact first/last frames.
-3. Connect product/style images to `video-reference-image`.
-4. Connect voice to `video-voice-reference` when narration voice matters.
-5. Run only after required upstream image/text nodes have completed.
+2. If the video depends on a precise visual look, generate the anchor image first, especially for fashion/product/storyboard/keyframe clips.
+3. For multi-scene videos, make an asset manifest first. Generate or attach missing reusable characters, props/products, wardrobe, or locations before the scene videos.
+4. Connect start/end frames only when the user wants exact first/last frames.
+5. Connect product/style/character/location references to `video-reference-image` only when they add necessary information not already present in the anchor image.
+6. Connect voice to `video-voice-reference` when narration voice matters.
+7. Run only after required upstream image/text nodes have completed.
 
 ## Run Scheduling
 
