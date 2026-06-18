@@ -18,11 +18,13 @@ Follow `AGENTS.md` first. This file keeps the same guidance short for Claude-sty
 
 Use `veogenie-model-selector` before choosing or updating model settings. Prefer GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, and Veo 3.1 models for normal video.
 
+Use `veogenie-ai-assistant-prompt-writer` to choose prompt-authoring mode. Prefer Codex-direct prompts; use `aiAssistant` / `Tro Ly AI` only when prompt generation must be dynamic, reusable, grounded by runtime inputs, produce selectable variants, or is explicitly requested inside the workflow. Verify assistant text before downstream generation.
+
 Use `veogenie-image-to-video-input-planner` when a video should be created from a generated still, fashion look, product hero, storyboard frame, or exact visual anchor. Generate the anchor image first when it controls the look, then connect only necessary inputs to `videoGenerate`; omit redundant clothing/prop/style refs already visible in that anchor.
 
 Use `veogenie-continuity-asset-planner` before multi-scene videos when important characters, products, props, wardrobe, locations, or style references must stay consistent. If the script adds characters that were not supplied by the user, create those character reference images before scene videos and route them through `video-reference-image`.
 
-Use `veogenie-viral-video-producer` for hook-driven scripts, natural dialogue, and multi-scene short videos. Create one video node per scene and export ordered clips. Do not say the clips were merged into one final file unless a verified merge/stitch tool is available.
+Use `veogenie-viral-video-producer` for hook-driven scripts, natural dialogue, and multi-scene short videos. Create one video node per scene and, when the user wants one final combined file, connect ordered finished clips into a `videoMerge` node.
 
 ## Project Memory
 
@@ -38,6 +40,7 @@ Store only durable rules: agent process in `AGENTS.md`, short companion guidance
 - `aiAssistant`: generated text for later nodes.
 - `imageGenerate`: image output.
 - `videoGenerate`: video output.
+- `videoMerge`: local lossless merge output for two or more finished video clips.
 
 ## Useful Connections
 
@@ -57,6 +60,9 @@ imageGenerate:generatedAsset -> videoGenerate:frame-end
 imageGenerate:generatedAsset -> videoGenerate:video-reference-image
 
 voiceReference:voice -> videoGenerate:video-voice-reference
+
+videoGenerate:video -> videoMerge:video
+videoMerge:video -> videoMerge:video
 ```
 
 Use `frame-start` for the first frame, `frame-end` for the last frame, and `video-reference-image` for product/style/character references.
@@ -69,11 +75,15 @@ If the user asks for synchronized voice, narration, or shared speaker voice, rou
 
 For many videos with the same narration voice, create one `voiceReference` node with an exact built-in preset name and connect it to every `videoGenerate:video-voice-reference` input. Keep each video's prompt and frame inputs separate unless the user wants them shared too.
 
+## Video Merge
+
+Use `videoMerge` only after the source clips are generated. Connect video outputs to `videoMerge:video` in the desired order, wait for all source clips to be `success`, then run/export the merge node as the final combined video.
+
 ## Run Scheduling
 
 Do not wait for one independent branch to finish before starting another. Inspect the workflow, queue all ready independent output nodes with separate `run_node` calls, keep each `commandId`, and poll each with `get_run_orchestration_status`.
 
-Only wait when there is a real dependency: a downstream node must not run until the upstream node is `success` and has the expected text/image/video output. Never queue the same node twice while its command is queued/dispatched or its output is running. Prefer `run_group` when a group should enforce dependencies internally.
+Only wait when there is a real dependency: a downstream node must not run until the upstream node is `success` and has the expected text/image/video output. A `videoMerge` node must wait for at least two connected video outputs to finish. Never queue the same node twice while its command is queued/dispatched or its output is running. Prefer `run_group` when a group should enforce dependencies internally.
 
 ## Result Handoff
 

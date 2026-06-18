@@ -17,11 +17,13 @@ Canvas mutation tools still go through the desktop app command queue. `update_wo
 
 Use `veogenie-model-selector` before choosing or updating model settings on `imageGenerate` or `videoGenerate` nodes. Default guidance: GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, and Veo 3.1 models for normal video.
 
+Use `veogenie-ai-assistant-prompt-writer` when deciding how prompts should be authored. Let Codex write final prompts directly by default. Add `aiAssistant` / `Tro Ly AI` only for dynamic, reusable, runtime-grounded, variant-producing, or explicitly requested prompt-writing stages; verify its text output before running downstream image/video nodes.
+
 Use `veogenie-image-to-video-input-planner` when a video should be grounded by a generated still, product hero, fashion look, storyboard frame, or exact visual anchor. Create the image first when it controls the final look, then connect only the minimal inputs to `videoGenerate`; omit redundant wardrobe/prop/style refs if the anchor image already contains them clearly.
 
 Use `veogenie-continuity-asset-planner` before multi-scene videos when the script has missing or recurring characters, wardrobe, props/products, locations, style refs, or shared voice inputs. If the user supplied only one character but the script adds other important characters, create those character reference images first, then route them to every relevant scene through `video-reference-image`.
 
-Use `veogenie-viral-video-producer` when the user wants a hook-driven short video, viral-style script, natural spoken dialogue, or multiple clips that form one story. Build one `videoGenerate` node per scene, keep dialogue human and speakable, connect one shared `voiceReference` to all scenes when voice consistency matters, and export clips in scene order. Do not claim VeoGenie produced one merged final video unless MCP capabilities expose a verified merge/stitch tool.
+Use `veogenie-viral-video-producer` when the user wants a hook-driven short video, viral-style script, natural spoken dialogue, or multiple clips that form one story. Build one `videoGenerate` node per scene, keep dialogue human and speakable, connect one shared `voiceReference` to all scenes when voice consistency matters, and connect ordered finished clips into a `videoMerge` node when the user wants one final combined video.
 
 ## Project Memory From Feedback
 
@@ -44,6 +46,7 @@ Do not update these files silently after every run. Only store durable guidance 
 - `aiAssistant` / `Tro Ly AI`: produces text. Use its generated text as a prompt for downstream image or video nodes.
 - `imageGenerate` / `Tao Anh`: creates images from text and optional image references.
 - `videoGenerate` / `Tao Video`: creates videos from text, optional start/end frames, optional reference images, and optional voice.
+- `videoMerge` / `Ghép Video`: locally merges two or more finished video outputs in edge order without re-encoding when compatible.
 - `group`: runs a set of connected nodes while respecting their dependencies.
 
 ## Common Connections
@@ -67,6 +70,9 @@ imageReference:image -> videoGenerate:video-reference-image
 imageGenerate:generatedAsset -> videoGenerate:video-reference-image
 
 voiceReference:voice -> videoGenerate:video-voice-reference
+
+videoGenerate:video -> videoMerge:video
+videoMerge:video -> videoMerge:video
 ```
 
 Choose the video image port by meaning:
@@ -95,6 +101,22 @@ voiceReference:voice -> videoGenerate:video-voice-reference
 
 Each `videoGenerate` node can still have its own text prompt, start frame, end frame, and reference images. The shared voice node keeps the spoken voice consistent across the batch.
 
+## Merge Multiple Clips
+
+Use `videoMerge` when the user wants one final combined video from several generated clips.
+
+1. Create one `videoMerge` node after the scene clips.
+2. Connect each source clip in the intended order:
+
+```text
+videoGenerate:video -> videoMerge:video
+videoGenerate:video -> videoMerge:video
+videoGenerate:video -> videoMerge:video
+```
+
+3. Do not run `videoMerge` until at least two connected upstream `videoGenerate` or `videoMerge` nodes are `success` and each has a generated video asset.
+4. Report/export the final media from the `videoMerge` node, not from the individual clips, when the user asked for one combined file.
+
 ## Basic Workflows
 
 For a product image job:
@@ -115,7 +137,8 @@ For a video job:
 4. Connect start/end frames only when the user wants exact first/last frames.
 5. Connect product/style/character/location references to `video-reference-image` only when they add necessary information not already present in the anchor image.
 6. Connect voice to `video-voice-reference` when narration voice matters.
-7. Run only after required upstream image/text nodes have completed.
+7. Add `videoMerge` after scene clips only when one combined video is requested.
+8. Run only after required upstream image/text/video nodes have completed.
 
 ## Run Scheduling
 
@@ -125,7 +148,7 @@ Do not serialize independent work by habit. Before running, inspect `get_current
 - Nodes in different branches with no dependency between them can be queued in the same scheduling pass with separate `run_node` calls.
 - After queuing multiple ready nodes, keep every returned `commandId` and poll each one with `get_run_orchestration_status`.
 - Do not queue the same node twice while its command is `queued`/`dispatched` or its output is `running`.
-- Do not queue a downstream node until the upstream node it depends on is `success` and `get_node_outputs` shows the expected output.
+- Do not queue a downstream node until the upstream node it depends on is `success` and `get_node_outputs` shows the expected output. For `videoMerge`, all connected source video nodes must be complete first.
 - Prefer `run_group` when the ready nodes are in one group and the app should enforce internal dependencies.
 
 Example: if three `imageGenerate` nodes each use their own `textPrompt` and `imageReference`, queue all three `run_node` calls first, then poll all three. If one `videoGenerate` uses the first image output as `frame-start`, wait for that image node before running the video node.

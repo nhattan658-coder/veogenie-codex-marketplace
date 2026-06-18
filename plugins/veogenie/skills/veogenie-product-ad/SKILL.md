@@ -7,7 +7,7 @@ description: Create high-quality VeoGenie product advertising workflows, prompts
 
 ## Scope
 
-Use this skill for product-focused creative work. Pair it with the core `veogenie` skill for MCP safety, `veogenie-workflow-designer` when building or reviewing node structure, `veogenie-model-selector` when choosing image/video models or resolution, `veogenie-image-to-video-input-planner` when a hero image should be generated before product/fashion video or when video inputs need pruning, `veogenie-continuity-asset-planner` when products/props/people/locations must stay consistent across scenes, and `veogenie-viral-video-producer` when the ad needs a hook-driven multi-scene script.
+Use this skill for product-focused creative work. Pair it with the core `veogenie` skill for MCP safety, `veogenie-workflow-designer` when building or reviewing node structure, `veogenie-ai-assistant-prompt-writer` when deciding whether Codex or `Tro Ly AI` should write the prompt, `veogenie-model-selector` when choosing image/video models or resolution, `veogenie-image-to-video-input-planner` when a hero image should be generated before product/fashion video or when video inputs need pruning, `veogenie-continuity-asset-planner` when products/props/people/locations must stay consistent across scenes, and `veogenie-viral-video-producer` when the ad needs a hook-driven multi-scene script.
 
 ## Default Process
 
@@ -49,10 +49,13 @@ Use prompts that specify:
 - For image-only ads, use `imageReference` + `textPrompt` + `imageGenerate`.
 - For image and video, generate a strong hero frame first, then feed it into `videoGenerate`.
 - For fashion video, generate the final fashion still first; usually feed that still to `videoGenerate` and omit separate wardrobe references when the still already shows the outfit clearly.
+- For multi-clip ad videos, connect finished scene clips to `videoMerge:video` and export the `videoMerge` result when the user wants one final combined file.
 - Use `aiAssistant` when the brief needs script, shot list, caption copy, or multiple prompt variants.
 - Avoid `characterReference` / `Nhan Vat` while it is locked.
 
 ## AI Assistant Prompt Writer
+
+Apply `veogenie-ai-assistant-prompt-writer` first. Codex-direct prompt writing is the default; use the assistant mode below only when prompt generation must be dynamic, reusable, image-grounded at runtime, selectable as variants, or explicitly requested inside the workflow.
 
 Use `aiAssistant` / `Tro Ly AI` as a prompt writer when the user wants the agent to improve a rough brief, create prompt variants, write a video script, or turn product/image context into a polished image/video prompt.
 

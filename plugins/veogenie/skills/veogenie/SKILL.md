@@ -24,7 +24,8 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 
 ## Node And Skill Helpers
 
-- Use `veogenie-workflow-designer` when creating or appending workflow recipes, choosing node types, or connecting text/image/video/voice ports. It contains the authoritative port contract for `frame-start`, `frame-end`, `video-reference-image`, and `video-voice-reference`.
+- Use `veogenie-workflow-designer` when creating or appending workflow recipes, choosing node types, or connecting text/image/video/voice ports. It contains the authoritative port contract for `frame-start`, `frame-end`, `video-reference-image`, `video-voice-reference`, and `videoMerge:video`.
+- Use `veogenie-ai-assistant-prompt-writer` when deciding whether Codex should write a final prompt directly or an `aiAssistant` / `Tro Ly AI` node should generate prompts dynamically inside the workflow.
 - Use `veogenie-model-selector` when choosing or updating model/provider/resolution/duration fields for `imageGenerate` or `videoGenerate` nodes.
 - Use `veogenie-viral-video-producer` when creating hook-driven scripts, natural dialogue, multi-scene video plans, or several `videoGenerate` clips that form one short-form story.
 - Use `veogenie-continuity-asset-planner` before multi-scene videos when the agent must create or route missing characters, wardrobe, props/products, locations, style references, or shared voice inputs before video generation.
@@ -42,6 +43,7 @@ Common node roles:
 - `aiAssistant`: generated text for later nodes.
 - `imageGenerate`: image output.
 - `videoGenerate`: video output.
+- `videoMerge`: local lossless ordered video merge output. It needs at least two upstream video assets.
 
 Common video inputs:
 
@@ -52,6 +54,8 @@ imageReference:image -> videoGenerate:frame-start
 imageReference:image -> videoGenerate:frame-end
 imageReference:image -> videoGenerate:video-reference-image
 voiceReference:voice -> videoGenerate:video-voice-reference
+videoGenerate:video -> videoMerge:video
+videoMerge:video -> videoMerge:video
 ```
 
 For video-from-frame/keyframe requests, route images to `frame-start` and optional `frame-end`; do not also route the same frame images to `video-reference-image`.
@@ -73,6 +77,7 @@ For several videos with the same voice, create one `voiceReference` node with an
 - Queue all ready independent branches in the same pass with separate `run_node` calls. Keep each returned `commandId`.
 - Poll every queued command with `get_run_orchestration_status`; do not block on one independent node before starting another.
 - A downstream node is not ready until each upstream output it uses is `success` and `get_node_outputs` shows the expected text/image/video asset.
+- A `videoMerge` node is not ready until at least two connected upstream video outputs are `success` and each has a generated video asset.
 - Do not queue the same node twice while its command is `queued`/`dispatched` or its output is `running`.
 - Prefer `run_group` when nodes are inside one group and the desktop app should enforce dependency order.
 

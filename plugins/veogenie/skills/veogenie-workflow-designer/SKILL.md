@@ -1,6 +1,6 @@
 ---
 name: veogenie-workflow-designer
-description: Design, review, or create VeoGenie workflow recipes with correct node types, edge handles, and MCP canvas-write sequencing. Use when Codex needs to build or append workflows, connect inputs to generate nodes, route text/image/video/voice outputs, or reason about video frame, reference image, and voice ports including video component-mode connections.
+description: Design, review, or create VeoGenie workflow recipes with correct node types, edge handles, and MCP canvas-write sequencing. Use when Codex needs to build or append workflows, connect inputs to generate or merge nodes, route text/image/video/voice outputs, or reason about video frame, reference image, voice, and videoMerge ports including video component-mode connections.
 ---
 
 # VeoGenie Workflow Designer
@@ -13,18 +13,21 @@ Before creating or appending a workflow:
 
 1. Use the base `veogenie` skill to read app state.
 2. Read `references/node-port-contract.md`.
-3. Use `veogenie-model-selector` when setting `model`, `provider`, `width`, `height`, `aspectRatio`, or `duration` on output nodes.
-4. Use `veogenie-viral-video-producer` when the workflow represents a multi-scene short, viral script, or ordered set of video clips.
-5. Use `veogenie-continuity-asset-planner` when the workflow has multiple characters, generated cast members, recurring props/products, wardrobe, locations, or style references that must stay consistent across video scenes.
-6. Use `veogenie-image-to-video-input-planner` when deciding whether to create upstream `imageGenerate` anchors before `videoGenerate`, or when pruning redundant image references from video inputs.
-7. If a voice input is involved, read `references/voice-connection-rules.md`.
-8. If the user asks for a full workflow pattern, read `references/workflow-patterns.md`.
+3. Use `veogenie-ai-assistant-prompt-writer` before adding `aiAssistant` / `Tro Ly AI` as a prompt-writing stage; Codex-direct prompt writing is the default unless the assistant stage has clear runtime value.
+4. Use `veogenie-model-selector` when setting `model`, `provider`, `width`, `height`, `aspectRatio`, or `duration` on output nodes.
+5. Use `veogenie-viral-video-producer` when the workflow represents a multi-scene short, viral script, or ordered set of video clips.
+6. Use `veogenie-continuity-asset-planner` when the workflow has multiple characters, generated cast members, recurring props/products, wardrobe, locations, or style references that must stay consistent across video scenes.
+7. Use `veogenie-image-to-video-input-planner` when deciding whether to create upstream `imageGenerate` anchors before `videoGenerate`, or when pruning redundant image references from video inputs.
+8. If a voice input is involved, read `references/voice-connection-rules.md`.
+9. If the user asks for a full workflow pattern, read `references/workflow-patterns.md`.
 
 ## Recipe Rules
 
 - Always set explicit `sourceHandle` and `targetHandle` on every recipe edge.
 - Do not rely on default handle inference when the target is `videoGenerate`.
+- Do not rely on default handle inference when the target is `videoMerge`; connect only video outputs to `videoMerge:video`.
 - Treat `frame-start`, `frame-end`, `video-reference-image`, and `video-voice-reference` as different semantics.
+- Use `videoMerge` only to combine two or more completed video outputs in edge order. Valid inputs are `videoGenerate:video -> videoMerge:video` and `videoMerge:video -> videoMerge:video`.
 - If the user asks to make a video from frames/keyframes, connect the images to `frame-start` and optionally `frame-end`; do not also connect those frame images to `video-reference-image`, and do not add voice unless requested.
 - If the user asks for synchronized narration/voice with image inputs, connect all image inputs to `video-reference-image` and connect the voice to `video-voice-reference`; use `frame-start`/`frame-end` only if the user explicitly asks for exact first/last frames.
 - For multi-scene videos, create upstream asset reference branches before scene video nodes when the script contains missing or recurring characters, wardrobe, props/products, or locations. Route those finished asset images to `video-reference-image` on every scene that needs them.
@@ -63,5 +66,6 @@ For existing nodes on the current page:
 - Poll `get_run_orchestration_status` for every queued command.
 - Do not call `run_node` again for the same node while its command is queued/dispatched or output is running.
 - Do not queue downstream dependent nodes until their upstream outputs exist and are verified with `get_node_outputs`.
+- Do not queue `videoMerge` until at least two connected upstream video outputs are `success` and have generated assets.
 - Prefer `run_group` when nodes are inside one group and the app should enforce internal dependencies.
 - After success, use the `veogenie-result-qa` skill for output verification and export.

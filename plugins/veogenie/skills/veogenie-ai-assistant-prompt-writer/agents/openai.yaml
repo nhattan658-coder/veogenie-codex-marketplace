@@ -1,0 +1,4 @@
+interface:
+  display_name: "VeoGenie AI Assistant Prompt Writer"
+  short_description: "Choose Codex or AI Assistant for prompts"
+  default_prompt: "Use $veogenie-ai-assistant-prompt-writer to decide whether Codex or a VeoGenie AI Assistant node should write this prompt."

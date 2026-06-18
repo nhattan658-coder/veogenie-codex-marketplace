@@ -20,6 +20,14 @@ call :try "%LOCALAPPDATA%\VeoGenie\veogenie-mcp.cmd"
 if defined VEOGENIE_MCP_RESOLVED goto :run
 call :try "%ProgramData%\VeoGenie\veogenie-mcp.cmd"
 if defined VEOGENIE_MCP_RESOLVED goto :run
+call :try "%LOCALAPPDATA%\Programs\VeoGenie Tool Agent\veogenie-mcp.cmd"
+if defined VEOGENIE_MCP_RESOLVED goto :run
+call :try "%LOCALAPPDATA%\VeoGenie Tool Agent\veogenie-mcp.cmd"
+if defined VEOGENIE_MCP_RESOLVED goto :run
+call :try "%ProgramFiles%\VeoGenie Tool Agent\veogenie-mcp.cmd"
+if defined VEOGENIE_MCP_RESOLVED goto :run
+call :try "%ProgramFiles(x86)%\VeoGenie Tool Agent\veogenie-mcp.cmd"
+if defined VEOGENIE_MCP_RESOLVED goto :run
 call :try "%LOCALAPPDATA%\Programs\VeoGenie Tool\veogenie-mcp.cmd"
 if defined VEOGENIE_MCP_RESOLVED goto :run
 call :try "%LOCALAPPDATA%\VeoGenie Tool\veogenie-mcp.cmd"
@@ -30,13 +38,19 @@ call :try "%ProgramFiles(x86)%\VeoGenie Tool\veogenie-mcp.cmd"
 if defined VEOGENIE_MCP_RESOLVED goto :run
 call :try "C:\VeoGenie Tool\veogenie-mcp.cmd"
 if defined VEOGENIE_MCP_RESOLVED goto :run
+call :try "C:\VeoGenie Tool Agent\veogenie-mcp.cmd"
+if defined VEOGENIE_MCP_RESOLVED goto :run
 call :try "D:\VeoGenie Tool\veogenie-mcp.cmd"
+if defined VEOGENIE_MCP_RESOLVED goto :run
+call :try "D:\VeoGenie Tool Agent\veogenie-mcp.cmd"
 if defined VEOGENIE_MCP_RESOLVED goto :run
 call :try "E:\VeoGenie Tool\veogenie-mcp.cmd"
 if defined VEOGENIE_MCP_RESOLVED goto :run
+call :try "E:\VeoGenie Tool Agent\veogenie-mcp.cmd"
+if defined VEOGENIE_MCP_RESOLVED goto :run
 
->&2 echo [veogenie-mcp-launcher] Could not find VeoGenie Tool's installed veogenie-mcp.cmd.
->&2 echo [veogenie-mcp-launcher] Install/open VeoGenie Tool, or set VEOGENIE_MCP_LAUNCHER to the full launcher path.
+>&2 echo [veogenie-mcp-launcher] Could not find VeoGenie Tool Agent's installed veogenie-mcp.cmd.
+>&2 echo [veogenie-mcp-launcher] Install/open VeoGenie Tool Agent, or set VEOGENIE_MCP_LAUNCHER to the full launcher path.
 exit /b 1
 
 :try

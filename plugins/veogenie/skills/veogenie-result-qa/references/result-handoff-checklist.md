@@ -24,7 +24,7 @@ with `get_node_outputs`.
 Confirm:
 
 - The node id matches the node the user asked to run.
-- The node type matches expected output: `imageGenerate`, `videoGenerate`, or `aiAssistant`.
+- The node type matches expected output: `imageGenerate`, `videoGenerate`, `videoMerge`, or `aiAssistant`.
 - The output status is success.
 - `generatedAsset` or `generatedText` exists when expected.
 
@@ -49,6 +49,17 @@ For videos:
   "source": "generated",
   "type": "video",
   "limit": 4
+}
+```
+
+For merged videos, use the same video album query with the exact `videoMerge` node id:
+
+```json
+{
+  "nodeId": "exact-video-merge-node-id",
+  "source": "generated",
+  "type": "video",
+  "limit": 1
 }
 ```
 

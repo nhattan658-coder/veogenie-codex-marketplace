@@ -48,4 +48,4 @@ When planning, include:
 - Do not use `resultCount` as a substitute for different characters or scene-specific assets. Use separate asset nodes when the visual identity differs.
 - Do not connect the same image to both `frame-start` and `video-reference-image` unless the user explicitly asks for both meanings and the app supports the intended routing.
 - Do not claim final continuity is verified until the generated asset refs and final clips have been checked from VeoGenie app state.
-- Do not claim one final stitched video unless MCP capabilities expose a verified merge/stitch tool.
+- Do not claim one final stitched video unless the workflow includes a verified `videoMerge` node that has run successfully.

@@ -12,6 +12,7 @@ MCP workflow authoring supports:
 - `voiceReference`
 - `imageGenerate`
 - `videoGenerate`
+- `videoMerge`
 - `aiAssistant`
 
 Do not use `collection` in MCP recipes unless the MCP contract explicitly adds support later.
@@ -28,6 +29,7 @@ Use these source handles:
 | `imageReference` | `image` | Uploaded/reference image. |
 | `imageGenerate` | `image` | Current generated image output. |
 | `videoGenerate` | `video` | Current generated video output. |
+| `videoMerge` | `video` | Current merged video output. |
 | `voiceReference` | `voice` | Flow voice reference or voice prompt hint. |
 
 ## Target Handles
@@ -63,6 +65,21 @@ Use these target handles exactly:
 | `video-voice-reference` | Voice reference input for `voiceReference`. | Single effective voice. |
 
 Do not confuse `frame-start`, `frame-end`, and `video-reference-image`.
+
+### `videoMerge`
+
+Use this target handle exactly:
+
+| Target handle | Meaning | Multiplicity |
+| --- | --- | --- |
+| `video` | Source video clip to merge. | Multiple allowed; merge order follows connected source order in the workflow. |
+
+Valid sources are video outputs only:
+
+- `videoGenerate:video -> videoMerge:video`
+- `videoMerge:video -> videoMerge:video`
+
+Do not connect text, image, or voice handles into `videoMerge`.
 
 ## Video Image Routing By User Intent
 
@@ -135,6 +152,15 @@ If the request includes both exact frames and voice, use both contracts: exact f
 }
 ```
 
+```json
+{
+  "source": "video-scene-01",
+  "target": "merge-final",
+  "sourceHandle": "video",
+  "targetHandle": "video"
+}
+```
+
 ## Invalid Edges
 
 Never create these edges:
@@ -146,6 +172,10 @@ Never create these edges:
 - `imageReference:image -> videoGenerate:text`
 - `textPrompt:text -> videoGenerate:frame-start`
 - `textPrompt:text -> videoGenerate:video-reference-image`
+- `textPrompt:text -> videoMerge:video`
+- `imageReference:image -> videoMerge:video`
+- `imageGenerate:image -> videoMerge:video`
+- `voiceReference:voice -> videoMerge:video`
 
 ## Default Handle Trap
 
@@ -159,6 +189,8 @@ Therefore, for video workflows, always set one of:
 
 based on the user intent.
 
+For `videoMerge`, always set `targetHandle` to `video`; never use a videoGenerate frame/reference handle on the merge node.
+
 ## Preflight Checklist
 
 Before calling `create_workflow_page` or `append_workflow_to_current_page`:
@@ -170,4 +202,6 @@ Before calling `create_workflow_page` or `append_workflow_to_current_page`:
 - A "voice sync/narration" request routes image inputs to `video-reference-image` plus `voiceReference:voice -> video-voice-reference`, unless the user explicitly asks for exact first/last frames.
 - Video reference image edges target `video-reference-image`, not `frame-start`, unless the image is explicitly the first frame.
 - Start and end frames are assigned deliberately.
+- Merge edges target only `videoMerge:video` and come from upstream video outputs.
+- A merge workflow has at least two source video clips before the `videoMerge` node is run.
 - Recipe does not include raw media payloads.

@@ -26,8 +26,8 @@ Use this skill when the user wants a complete short-form video concept, script, 
 5. Use `veogenie-image-to-video-input-planner` for scenes that need generated still anchors, storyboard frames, fashion looks, or product hero frames before video.
 6. Read `references/natural-dialogue-rubric.md` and write exact spoken lines for each scene. Keep the lines short, human, and speakable.
 7. Turn each scene into one `textPrompt` plus one `videoGenerate` node. Each scene prompt must include scene role, duration, visual action, camera, continuity constraints from the asset manifest, exact dialogue, and transition intent.
-8. Read `references/multi-scene-workflow-patterns.md` before creating or appending workflow recipes.
-9. Run only after the user asks to generate and `actions` permission is enabled. Export ordered clips only after `project_export` permission is enabled.
+8. Read `references/multi-scene-workflow-patterns.md` before creating or appending workflow recipes. Add a `videoMerge` node when the user wants one final combined video.
+9. Run only after the user asks to generate and `actions` permission is enabled. Run `videoMerge` only after all source clips are complete. Export ordered clips or the final merge output only after `project_export` permission is enabled.
 
 ## Output Contract
 
@@ -41,15 +41,15 @@ When planning, return:
 - `assetManifest`: shared characters, props/products, wardrobe, locations, style refs, and voice inputs that must exist before video generation
 - `workflowPlan`: node/edge outline with explicit handles
 - `runPlan`: which nodes can run in parallel and which depend on upstream images/text
-- `handoffPlan`: expected exported clip filenames in scene order
+- `handoffPlan`: expected exported clip filenames in scene order, plus the merged output filename when using `videoMerge`
 
 Do not claim a video will go viral. Say "viral-style" or "optimized for short-form retention".
 
 ## Important Limits
 
-VeoGenie currently creates and exports generated media clips from nodes. If no verified merge/stitch/timeline tool exists in the MCP capabilities, do not claim the ordered clips have been merged into one final file.
+VeoGenie supports a local `videoMerge` node for ordered lossless merging of finished video clips. Use it when the user asks for one final combined video and MCP capabilities/recipe contract include `videoMerge`.
 
-If the user asks for one final complete video, create/export ordered clips such as:
+If the user asks for one final complete video, create ordered clips such as:
 
 ```text
 render/<job-slug>/scene-01-hook.mp4
@@ -59,7 +59,15 @@ render/<job-slug>/scene-04-payoff.mp4
 render/<job-slug>/scene-05-cta.mp4
 ```
 
-Then state that final stitching requires an external editor or a future verified VeoGenie merge tool.
+Then connect those clip nodes to:
+
+```text
+videoGenerate:video -> videoMerge:video
+videoGenerate:video -> videoMerge:video
+videoGenerate:video -> videoMerge:video
+```
+
+Run/export the `videoMerge` node as `render/<job-slug>/final-merged.mp4` after all source clips are `success`.
 
 ## Quality Rules
 
@@ -71,3 +79,4 @@ Then state that final stitching requires an external editor or a future verified
 - If a scene includes a named/important character, product, prop, outfit, or location that is not in the user inputs, create a reusable reference image before running that scene.
 - Use one `videoGenerate` node per scene; do not use `resultCount` as a substitute for different story beats.
 - Use `resultCount` only for variants of the same scene, such as testing two hook deliveries, when the user asks for variants.
+- Do not run `videoMerge` until at least two connected source video nodes are complete and verified from app state.

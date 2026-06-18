@@ -136,3 +136,26 @@ Use `veogenie-viral-video-producer` for hook-driven scripts, natural dialogue, s
 Before creating scene video nodes, use `veogenie-continuity-asset-planner` when the script has missing or recurring characters, props/products, wardrobe, locations, or style references. Create the required pre-production `textPrompt` + `imageGenerate` asset branches first, then route finished asset images to each scene through `video-reference-image`.
 
 For any scene grounded by a generated still, use `veogenie-image-to-video-input-planner` to decide whether that still belongs on `frame-start` or `video-reference-image`, and to omit redundant refs that would confuse the video model.
+
+## Merge Ordered Video Clips
+
+Use this when the user wants one final combined video from several generated clips.
+
+Nodes:
+
+- Two or more upstream `videoGenerate` or `videoMerge` nodes that already produce video assets.
+- One `videoMerge` node for the combined output.
+
+Edges:
+
+- `videoGenerate:video -> videoMerge:video`
+- `videoMerge:video -> videoMerge:video` when chaining merge outputs.
+
+Run order:
+
+1. Run all source `videoGenerate` nodes first.
+2. Verify every source node is `success` and has a generated video asset with `get_node_outputs`.
+3. Run `videoMerge`.
+4. Report/export media from the `videoMerge` node when the user asked for one final combined file.
+
+Do not connect text, image, or voice inputs directly to `videoMerge`.

@@ -61,6 +61,7 @@ The default `.mcp.json` is read-only. It lets Codex call tools such as:
 The plugin includes several skills for AI Agent work:
 
 - `veogenie`: safe MCP startup, permissions, run/poll, and result handoff.
+- `veogenie-ai-assistant-prompt-writer`: decide whether Codex should write a final prompt directly or use `aiAssistant` / `Tro Ly AI` for dynamic, reusable, runtime-grounded prompt generation.
 - `veogenie-workflow-designer`: workflow recipe design, explicit edge handles, and correct text/image/video/voice port routing.
 - `veogenie-model-selector`: choose image/video models, provider, resolution, aspect ratio, and duration for output nodes.
 - `veogenie-image-to-video-input-planner`: decide when to generate an image before video, choose minimal video inputs, and omit redundant references that would confuse image/video models.
@@ -73,6 +74,8 @@ The plugin includes several skills for AI Agent work:
 
 For workflow authoring, the agent should read the workflow designer port contract before writing canvas recipes. Voice input must use `voiceReference:voice -> videoGenerate:video-voice-reference`; if a human is connecting manually and the voice port is not visible, switch `Tao Video` to component/input view before connecting voice.
 
+For prompt authoring, use `veogenie-ai-assistant-prompt-writer`. Codex should write the final prompt directly by default. Add `aiAssistant` / `Tro Ly AI` only when prompt generation must depend on runtime inputs, remain reusable on canvas, produce selectable variants, or the user explicitly wants an assistant prompt-writing stage.
+
 Video image routing must follow user intent. If the user asks to make a video from frames or keyframes, use `frame-start` and optional `frame-end`, and do not also put those frame images into `video-reference-image`. If the user asks for synchronized voice or narration, put image inputs into `video-reference-image` by default and connect the voice to `video-voice-reference`; only use `frame-start`/`frame-end` when exact first/last frames are explicitly requested.
 
 Model choice should follow `veogenie-model-selector`: GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, and Veo 3.1 models for normal video.
@@ -81,7 +84,7 @@ For image-first video workflows, use `veogenie-image-to-video-input-planner` bef
 
 For multi-scene videos, use `veogenie-continuity-asset-planner` before running `videoGenerate` nodes when the script has missing or recurring characters, products, props, wardrobe, locations, or style references. If the user supplies only one main character but the script adds other important characters, the agent should create those character reference images first, then route the finished assets to each relevant scene through `video-reference-image`.
 
-For viral-style short videos, use `veogenie-viral-video-producer` to write the hook, beat sheet, natural dialogue, scene plan, and ordered `videoGenerate` clip workflow. Unless MCP capabilities include a verified merge/stitch tool, report the result as ordered exported clips, not one final combined video file.
+For viral-style short videos, use `veogenie-viral-video-producer` to write the hook, beat sheet, natural dialogue, scene plan, and ordered `videoGenerate` clip workflow. When the user wants one final combined file, connect the finished scene clips into a `videoMerge` node with `videoGenerate:video -> videoMerge:video`, run it after the source clips succeed, and report/export the merge node result.
 
 ## Optional Guards
 
@@ -236,6 +239,8 @@ PRIVACY.md
 TERMS.md
 LICENSE.md
 skills/veogenie/SKILL.md
+skills/veogenie-ai-assistant-prompt-writer/SKILL.md
+skills/veogenie-ai-assistant-prompt-writer/agents/openai.yaml
 skills/veogenie-workflow-designer/SKILL.md
 skills/veogenie-model-selector/SKILL.md
 skills/veogenie-image-to-video-input-planner/SKILL.md

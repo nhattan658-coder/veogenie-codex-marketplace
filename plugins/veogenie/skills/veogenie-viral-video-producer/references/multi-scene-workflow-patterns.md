@@ -4,7 +4,7 @@ Use these patterns to turn a viral script into ordered VeoGenie clips.
 
 ## Current Capability Boundary
 
-VeoGenie can create `videoGenerate` outputs and export generated media. Unless MCP capabilities include a verified merge/stitch/timeline tool, the workflow output is an ordered clip set, not one final combined video file.
+VeoGenie can create `videoGenerate` outputs, merge finished clips with `videoMerge`, and export generated media. If the user asks for one final combined video, add a `videoMerge` node after the scene clips and export that node's media. If no merge node is present in the actual app/MCP snapshot, report ordered clips only.
 
 ## Pattern A: Direct Multi-Scene Video
 
@@ -19,6 +19,7 @@ Optional shared nodes:
 
 - `imageReference`: product/person/style reference.
 - `voiceReference`: one shared voice for all scenes.
+- `videoMerge`: optional final combined output after all scenes finish.
 - `group`: contains the full short-form sequence.
 
 Edges for each scene:
@@ -30,6 +31,14 @@ voiceReference:voice -> videoGenerate:video-voice-reference
 ```
 
 Use `video-reference-image` for visual continuity references. Use `frame-start` only when an image must be the exact first frame.
+
+Optional merge edges after scene clips:
+
+```text
+videoGenerate:video -> videoMerge:video
+videoGenerate:video -> videoMerge:video
+videoGenerate:video -> videoMerge:video
+```
 
 ## Pattern B: Storyboard Frames Then Video
 
@@ -136,6 +145,7 @@ video-scene-02-setup
 voice-shared
 ref-product-main
 group-viral-short
+merge-final
 prompt-char-supporting
 image-char-supporting
 prompt-fashion-look
@@ -146,6 +156,7 @@ image-fashion-look
 
 - If scenes only depend on shared reference images and prompts, queue all `videoGenerate` nodes in the same scheduling pass with separate `run_node` calls.
 - If scenes depend on generated storyboard frames, run all ready `imageGenerate` nodes first, verify outputs, then run the dependent `videoGenerate` nodes.
+- Run `videoMerge` only after at least two connected source video nodes are `success` and have generated video assets.
 - Do not queue a scene twice while its command is `queued`/`dispatched` or output is `running`.
 - Use `run_group` only when the user wants the app to enforce group dependencies.
 
@@ -159,6 +170,9 @@ render/<job-slug>/scene-02-setup.mp4
 render/<job-slug>/scene-03-escalation.mp4
 render/<job-slug>/scene-04-payoff.mp4
 render/<job-slug>/scene-05-cta.mp4
+render/<job-slug>/final-merged.mp4
 ```
 
 Poll `get_command_status` after every export. If an export fails, refresh app state and retry that media id at most once.
+
+When the user wants one final file, export `final-merged.mp4` from the `videoMerge` node after verifying the merge node output with `get_node_outputs` and node-specific `get_media_album(type="video")`.

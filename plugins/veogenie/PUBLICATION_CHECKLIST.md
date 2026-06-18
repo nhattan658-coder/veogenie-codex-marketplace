@@ -62,6 +62,7 @@ Required skill folders must be present before export:
 
 ```text
 skills/veogenie
+skills/veogenie-ai-assistant-prompt-writer
 skills/veogenie-workflow-designer
 skills/veogenie-model-selector
 skills/veogenie-image-to-video-input-planner
