@@ -80,6 +80,15 @@ The plugin launcher resolver must be present before export:
 bin/veogenie-mcp-launcher.cmd
 ```
 
+Hermes Agent package templates must be present before export:
+
+```text
+hermes/README-HERMES.md
+hermes/HERMES_INSTRUCTIONS.md
+hermes/mcp-config.json
+hermes/mcp-config.absolute.example.json
+```
+
 The result QA skill must include:
 
 ```text
@@ -136,6 +145,14 @@ dist/codex-marketplace
 This folder contains `.agents/plugins/marketplace.json` plus `plugins/veogenie`, and does not contain the desktop app source.
 It also includes root-level `AGENTS.md` and `CLAUDE.md` so Codex and Claude can read the basic node/input/voice workflow before using the plugin.
 
+For a Hermes Agent offline handoff, use:
+
+```text
+dist/hermes-agent
+```
+
+This folder contains `mcp-config.json`, `HERMES_INSTRUCTIONS.md`, the launcher resolver, and a copied `skills/` folder. It is not a Codex marketplace package. Zip this folder as `veogenie-hermes-agent-<version>.zip` for customers who use Hermes Agent.
+
 If publishing via GitHub, push the standalone marketplace root so Codex can add the repo with:
 
 ```text
@@ -153,9 +170,11 @@ enabled = true
 
 ## Default Safety
 
-- Keep `.mcp.json` read-only by default.
+- Keep `.mcp.json` workflow read-only by default; do not enable write/run/import/export guards.
 - Do not enable `VEOGENIE_MCP_ALLOW_ACTIONS`, `VEOGENIE_MCP_ALLOW_CANVAS_WRITE`, `VEOGENIE_MCP_ALLOW_MEDIA_EXPORT`, `VEOGENIE_MCP_ALLOW_MEDIA_IMPORT`, `VEOGENIE_MCP_ALLOW_PROJECT_EXPORT`, or `VEOGENIE_MCP_ALLOW_RUN` by default.
 - `grant_mcp_session_permissions` may be available, but it must only grant temporary permissions after the user explicitly approves the action in chat.
+- `open_installed_app` may be available, but it must require `confirmOpenApp=true`, only launch the installed app, and must not close/kill/restart the app or run workflows.
+- `open_google_flow_login` may be available, but it must require `confirmOpenGoogleFlowLogin=true`, only open the managed Google Flow debug login browser, and must not run workflows or click Generate.
 - Keep `run_workflow_payload` env-only via `VEOGENIE_MCP_ALLOW_RUN=1`; do not allow session grants for raw workflow payloads.
 - Document guarded tools as opt-in only.
 - Keep `AGENTS.md` and `CLAUDE.md` short and practical: node roles, correct input routing, shared voice wiring, basic run/poll/export flow.
@@ -170,6 +189,8 @@ With the app open, ask Codex:
 
 ```text
 Use the VeoGenie MCP plugin to call get_mcp_capabilities, get_app_status, list_pages, and get_current_workflow.
+If testing app launch, close the app first and call open_installed_app with confirmOpenApp=true, then verify get_app_status becomes reachable.
+If testing Google Flow login browser launch, call open_google_flow_login with confirmOpenGoogleFlowLogin=true while the app is open, then poll get_command_status.
 Optionally call build_product_ad_workflow_recipe with a sample product brief and confirm it only returns a recipe.
 Optionally call get_run_orchestration_status with a known nodeId only after confirming it is read-only and does not queue a run.
 Do not run Google Flow, ChatGPT, GPT Image 2, create/append pages, import media, export files, run_node, run_group, or run_workflow_payload.

@@ -7,20 +7,24 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 
 ## Preconditions
 
-- The user must install and open the VeoGenie desktop app.
+- The user must install the VeoGenie desktop app.
 - The local backend should answer `http://127.0.0.1:8788/health`.
 - The plugin starts `bin\veogenie-mcp-launcher.cmd`, which resolves the installed `veogenie-mcp.cmd` from stable user paths, common install paths, or `VEOGENIE_MCP_LAUNCHER`.
+- If the backend is not reachable and the user asked the agent to control VeoGenie, call `open_installed_app` with `confirmOpenApp=true`, then call `get_app_status` again. If it still fails, ask the user to open the app manually.
+- If the user asked the agent to prepare Google Flow login/browser access, call `open_google_flow_login` with `confirmOpenGoogleFlowLogin=true`, then poll `get_command_status`. The user may still need to finish Google login, 2FA, or captcha in the opened browser.
 
 ## Basic Flow
 
 1. Call `get_mcp_capabilities`.
 2. Call `get_app_status`.
-3. Call `list_pages`.
-4. Call `get_current_workflow` before reasoning about nodes or edges.
-5. Use `get_node_outputs` or `get_media_album` for sanitized outputs.
-6. Use `build_product_ad_workflow_recipe` only when planning a product ad workflow; it is read-only and only returns a recipe plus next steps.
-7. Use `plan_product_ad_job` for an end-to-end product ad tool-call plan; it is read-only and does not execute the plan.
-8. After a guarded `run_node` or `run_group`, use `get_run_orchestration_status` with the returned command id before deciding whether to poll again or read final outputs.
+3. If `get_app_status` is unreachable and the user wants the agent to open/control the app, call `open_installed_app` with `confirmOpenApp=true`.
+4. If the user wants the agent to prepare Google Flow login/debug browser access, call `open_google_flow_login` with `confirmOpenGoogleFlowLogin=true`.
+5. Call `list_pages`.
+6. Call `get_current_workflow` before reasoning about nodes or edges.
+7. Use `get_node_outputs` or `get_media_album` for sanitized outputs.
+8. Use `build_product_ad_workflow_recipe` only when planning a product ad workflow; it is read-only and only returns a recipe plus next steps.
+9. Use `plan_product_ad_job` for an end-to-end product ad tool-call plan; it is read-only and does not execute the plan.
+10. After a guarded `run_node` or `run_group`, use `get_run_orchestration_status` with the returned command id before deciding whether to poll again or read final outputs.
 
 ## Node And Skill Helpers
 
@@ -83,6 +87,8 @@ For several videos with the same voice, create one `voiceReference` node with an
 
 ## Guarded Tools
 
+- `open_installed_app` can launch the installed VeoGenie desktop app after `confirmOpenApp=true`. It has no close/restart capability and must not be used unless the user asked the agent to open/control VeoGenie.
+- `open_google_flow_login` can ask the open app to launch the managed Google Flow Chrome/Edge debug login browser after `confirmOpenGoogleFlowLogin=true`. It has no workflow-run capability and must not be used unless the user asked the agent to prepare Google Flow browser/login access.
 - If the user explicitly approves permissions in chat, call `grant_mcp_session_permissions` with the needed permissions and `confirmGrantSessionPermissions=true`. This avoids asking the user to set PowerShell env vars.
 - `run_node` and `run_group` require `VEOGENIE_MCP_ALLOW_ACTIONS=1` or session permission `actions`.
 - `create_workflow_page`, `append_workflow_to_current_page`, `update_workflow_nodes`, `delete_workflow_nodes`, and `undo_last_mcp_canvas_write` require `VEOGENIE_MCP_ALLOW_CANVAS_WRITE=1` or session permission `canvas_write`, plus the tool-specific confirm fields.
@@ -99,6 +105,8 @@ For node/group runs, do not call `run_workflow_payload`; use `run_node` / `run_g
 ## Safety
 
 - Do not run Google Flow, ChatGPT, GPT Image 2, node/group actions, or full workflow payloads during a read-only check.
+- Do not close, kill, or restart the VeoGenie desktop app from MCP. The current lifecycle tool is open-only.
+- Do not treat `open_google_flow_login` as a successful Google login by itself; it only opens the managed browser. Report clearly if the user must finish login, 2FA, or captcha.
 - `build_product_ad_workflow_recipe` must stay plan-only: do not treat its output as a canvas write until the user explicitly asks to create/append the workflow and the canvas-write guard is enabled.
 - `plan_product_ad_job` must stay plan-only: execute only its returned guarded tool-call steps when the user asked for that action and the matching guard is enabled.
 - Use `update_workflow_nodes` only for schema-safe node fields such as title, prompt, model, aspect ratio, result count, duration, position, or voice metadata. It must not edit generated outputs/status, media raw/base64, run nonce, or automation internals.

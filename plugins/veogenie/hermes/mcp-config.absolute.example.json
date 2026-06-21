@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "veogenie": {
+      "command": "cmd.exe",
+      "args": [
+        "/d",
+        "/c",
+        "C:\\VeoGenie\\veogenie-hermes-agent\\bin\\veogenie-mcp-launcher.cmd"
+      ],
+      "env": {
+        "VEOGENIE_WORKFLOW_BACKEND_URL": "http://127.0.0.1:8788"
+      }
+    }
+  }
+}

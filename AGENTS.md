@@ -8,10 +8,16 @@ Before changing anything, inspect the open desktop app:
 
 1. `get_mcp_capabilities`
 2. `get_app_status`
-3. `list_pages`
-4. `get_current_workflow`
+3. If the backend is unreachable and the user asked the agent to control/open VeoGenie, call `open_installed_app` with `confirmOpenApp=true`, then retry `get_app_status`.
+4. If the user asked the agent to prepare Google Flow login/browser access, call `open_google_flow_login` with `confirmOpenGoogleFlowLogin=true`, then poll `get_command_status`.
+5. `list_pages`
+6. `get_current_workflow`
 
 Use write/run/export tools only when the user asks for that action and grants the needed session permission or environment guard.
+
+`open_installed_app` is open-only. Do not close, kill, or restart the VeoGenie desktop app from MCP.
+
+`open_google_flow_login` only opens the managed Chrome/Edge debug browser for Google Flow login. It does not run Google Flow automation or click Generate.
 
 Canvas mutation tools still go through the desktop app command queue. `update_workflow_nodes` may edit only schema-safe node fields such as title, prompt, model, aspect ratio, result count, duration, position, size, and voice metadata. `delete_workflow_nodes` may remove nodes from the active page and connected edges; deleting a group also removes child nodes. These tools require `canvas_write` plus `confirmModifyCurrentPage=true`, return a rollback token, and must not be used to run Google Flow, ChatGPT, GPT Image 2, delete pages, delete media, or edit generated output/status fields.
 

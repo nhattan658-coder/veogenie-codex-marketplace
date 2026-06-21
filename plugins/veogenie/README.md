@@ -5,8 +5,9 @@ This plugin connects Codex to the locally installed VeoGenie desktop app through
 ## Requirements
 
 1. Install VeoGenie Tool.
-2. Open the desktop app.
-3. Confirm the local backend is running:
+2. Open the desktop app, or let the agent call `open_installed_app` with `confirmOpenApp=true` after you ask it to control VeoGenie.
+3. If Google Flow login/debug Chrome is not already open, ask the agent to call `open_google_flow_login` with `confirmOpenGoogleFlowLogin=true`, then log in once in that browser if Google asks.
+4. Confirm the local backend is running:
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8788/health
@@ -41,12 +42,18 @@ The installed app launcher starts the MCP server bundled with the desktop app an
 http://127.0.0.1:8788
 ```
 
+If the MCP server is available but the desktop app/backend is not running, the agent can call `open_installed_app` to launch the installed app and then probe `/health` again. This tool is open-only: it does not close, kill, restart, or run workflow automation.
+
+After the app/backend is reachable, the agent can call `open_google_flow_login` with `confirmOpenGoogleFlowLogin=true` when the user asks it to prepare Google Flow access. The open app runs the same action as the desktop "Dang nhap Google Flow" button: it opens Chrome/Edge with the managed Google Flow debug profile on port `9222`. The tool does not run a workflow or click Generate.
+
 ## Default Permissions
 
-The default `.mcp.json` is read-only. It lets Codex call tools such as:
+The default `.mcp.json` has no workflow write/run permissions. It lets Codex call tools such as:
 
 - `get_mcp_capabilities`
 - `get_app_status`
+- `open_installed_app` with `confirmOpenApp=true` when the user asked the agent to open/control the installed app
+- `open_google_flow_login` with `confirmOpenGoogleFlowLogin=true` when the user asked the agent to open/prepare Google Flow login
 - `list_pages`
 - `get_current_workflow`
 - `get_node_outputs`
@@ -88,7 +95,7 @@ For viral-style short videos, use `veogenie-viral-video-producer` to write the h
 
 ## Optional Guards
 
-The default plugin remains read-only. For normal Codex chat usage, prefer temporary session permissions instead of asking the user to set PowerShell environment variables.
+The default plugin has no workflow write/run permissions. For normal Codex chat usage, prefer temporary session permissions instead of asking the user to set PowerShell environment variables.
 
 When the user explicitly approves an action in chat, Codex can call:
 
@@ -290,6 +297,48 @@ enabled = true
 ```
 
 See `PUBLICATION_CHECKLIST.md` for the full release checklist.
+
+## Hermes Agent Offline Package
+
+`npm run plugin:export` also creates a Hermes-friendly offline package:
+
+```text
+dist/hermes-agent
+```
+
+This folder is not a Codex marketplace. It is for MCP clients such as Hermes Agent that can read an MCP server config plus instruction/knowledge files.
+
+The Hermes package contains:
+
+```text
+README-HERMES.md
+HERMES_INSTRUCTIONS.md
+mcp-config.json
+mcp-config.absolute.example.json
+bin/veogenie-mcp-launcher.cmd
+skills/
+LICENSE.md
+PRIVACY.md
+TERMS.md
+VERSION.txt
+```
+
+For offline customer handoff, zip `dist/hermes-agent` as:
+
+```text
+veogenie-hermes-agent-<version>.zip
+```
+
+Customer setup summary:
+
+1. Install and open VeoGenie Tool Agent.
+2. Unzip the Hermes package to a stable folder, for example `C:\VeoGenie\veogenie-hermes-agent`.
+3. Add `mcp-config.json` to Hermes Agent's MCP configuration.
+4. Add `HERMES_INSTRUCTIONS.md` as Hermes project/system instructions.
+5. Add the `skills/` folder as Hermes knowledge/instructions if Hermes supports folder attachments.
+6. Restart Hermes Agent and run the smoke test from `README-HERMES.md`.
+
+If Hermes does not resolve relative `cwd` from `mcp-config.json`, use `mcp-config.absolute.example.json` and replace the launcher path with the customer's unzip path.
 
 ## Test Prompt
 

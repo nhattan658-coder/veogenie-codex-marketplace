@@ -4,7 +4,7 @@ Follow `AGENTS.md` first. This file keeps the same guidance short for Claude-sty
 
 ## Basic Flow
 
-1. Inspect the app with `get_mcp_capabilities`, `get_app_status`, `list_pages`, and `get_current_workflow`.
+1. Inspect the app with `get_mcp_capabilities`, `get_app_status`, `list_pages`, and `get_current_workflow`. If `get_app_status` is unreachable and the user asked you to open/control VeoGenie, call `open_installed_app` with `confirmOpenApp=true`, then retry `get_app_status`. If the user asked you to prepare Google Flow login/browser access, call `open_google_flow_login` with `confirmOpenGoogleFlowLogin=true`, then poll `get_command_status`.
 2. Ask for or use only the permissions needed for the user's requested action.
 3. Create or append workflow pages only when the user wants a workflow change.
 4. Edit existing node fields with `update_workflow_nodes` or delete active-page nodes with `delete_workflow_nodes` only when the user asks, `canvas_write` is enabled, and `confirmModifyCurrentPage=true` is present.
@@ -15,6 +15,10 @@ Follow `AGENTS.md` first. This file keeps the same guidance short for Claude-sty
 9. Export with `export_media_to_workspace` when the user wants files in the project.
 
 `update_workflow_nodes` and `delete_workflow_nodes` do not run Google Flow, ChatGPT, GPT Image 2, or raw `/workflow/run`. Do not use them to edit generated output/status fields, delete pages, or delete media files.
+
+`open_installed_app` is open-only. Do not close, kill, or restart the VeoGenie desktop app from MCP.
+
+`open_google_flow_login` only opens the managed Chrome/Edge debug browser for Google Flow login. It does not run Google Flow automation or click Generate.
 
 Use `veogenie-model-selector` before choosing or updating model settings. Prefer GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, and Veo 3.1 models for normal video.
 
