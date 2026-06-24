@@ -70,7 +70,7 @@ The plugin includes several skills for AI Agent work:
 - `veogenie`: safe MCP startup, permissions, run/poll, and result handoff.
 - `veogenie-ai-assistant-prompt-writer`: decide whether Codex should write a final prompt directly or use `aiAssistant` / `Tro Ly AI` for dynamic, reusable, runtime-grounded prompt generation.
 - `veogenie-workflow-designer`: workflow recipe design, explicit edge handles, and correct text/image/video/voice port routing.
-- `veogenie-model-selector`: choose image/video models, provider, resolution, aspect ratio, and duration for output nodes.
+- `veogenie-model-selector`: choose image/video models, provider, resolution, aspect ratio, duration, and Gemini web thinking level for output nodes.
 - `veogenie-image-to-video-input-planner`: decide when to generate an image before video, choose minimal video inputs, and omit redundant references that would confuse image/video models.
 - `veogenie-continuity-asset-planner`: plan missing characters, wardrobe, props/products, locations, style refs, and voice inputs that must exist before video generation.
 - `veogenie-viral-video-producer`: create hook-driven short-form scripts, natural dialogue, and ordered multi-scene video workflows.
@@ -85,7 +85,9 @@ For prompt authoring, use `veogenie-ai-assistant-prompt-writer`. Codex should wr
 
 Video image routing must follow user intent. If the user asks to make a video from frames or keyframes, use `frame-start` and optional `frame-end`, and do not also put those frame images into `video-reference-image`. If the user asks for synchronized voice or narration, put image inputs into `video-reference-image` by default and connect the voice to `video-voice-reference`; only use `frame-start`/`frame-end` when exact first/last frames are explicitly requested.
 
-Model choice should follow `veogenie-model-selector`: GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, and Veo 3.1 models for normal video.
+Model choice should follow `veogenie-model-selector`: GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, Veo 3.1 models for normal video, and Gemini web video models only when the user explicitly wants the Gemini web flow.
+
+For Gemini web video models (`gemini-3.1-flash-lite-video`, `gemini-3.5-flash-video`, `gemini-3.1-pro-video`), set `geminiThinkingLevel` to `standard` for simple/fast prompts and `extended` for complex, product-fidelity, or high-constraint prompts. Do not set `geminiThinkingLevel` on Google Flow/labs models.
 
 For image-first video workflows, use `veogenie-image-to-video-input-planner` before wiring `videoGenerate`. Fashion video should usually generate the final fashion still/look first, then pass only the useful anchor image and necessary identity refs into the video node. If the generated fashion image already contains the outfit clearly, omit separate clothing/wardrobe refs from `videoGenerate`.
 
@@ -163,7 +165,7 @@ Do not enable all guards by default.
 
 `get_run_orchestration_status` is read-only. Use it after a guarded `run_node` or `run_group` call to check command ack and sanitized output status before deciding whether to poll again.
 
-`VEOGENIE_MCP_ALLOW_CANVAS_WRITE=1` or session permission `canvas_write` enables guarded canvas writes. `create_workflow_page` creates a new page, `append_workflow_to_current_page` appends a recipe, `update_workflow_nodes` edits schema-safe fields on existing nodes, `delete_workflow_nodes` removes existing nodes and connected edges, and `undo_last_mcp_canvas_write` rolls back the latest MCP canvas write when the token still matches. Node update/delete tools require `confirmModifyCurrentPage=true` and do not run Google Flow, ChatGPT, GPT Image 2, or raw `/workflow/run`.
+`VEOGENIE_MCP_ALLOW_CANVAS_WRITE=1` or session permission `canvas_write` enables guarded canvas writes. `create_workflow_page` creates a new page, `append_workflow_to_current_page` appends a recipe, `update_workflow_nodes` edits schema-safe fields on existing nodes including `geminiThinkingLevel` for Gemini web video nodes, `delete_workflow_nodes` removes existing nodes and connected edges, and `undo_last_mcp_canvas_write` rolls back the latest MCP canvas write when the token still matches. Node update/delete tools require `confirmModifyCurrentPage=true` and do not run Google Flow, ChatGPT, GPT Image 2, or raw `/workflow/run`.
 
 `VEOGENIE_MCP_ALLOW_MEDIA_IMPORT=1` enables `attach_local_media_to_node`, which reads a local image path through the desktop app and attaches it to an existing `imageReference` node. It also enables `attach_chat_image_to_node` for user images from the AI Agent chat after the agent has staged the attachment as a local file under `workspaceRoot`. These tools still require their confirm flags and do not accept or return media bytes/base64/data URLs/blob URLs through MCP.
 

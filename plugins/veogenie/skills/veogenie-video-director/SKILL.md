@@ -1,6 +1,6 @@
 ---
 name: veogenie-video-director
-description: Write and refine high-quality VeoGenie video prompts for Google Flow video generation. Use when Codex needs to direct scenes, camera motion, identity preservation, product or UGC ads, spoken lines, voice tone, frame/reference image usage, model-aware duration/aspect choices, or video prompt QA before running a videoGenerate node.
+description: Write and refine high-quality VeoGenie video prompts for Google Flow, Omni, or Gemini web video generation. Use when Codex needs to direct scenes, camera motion, identity preservation, product or UGC ads, spoken lines, voice tone, frame/reference image usage, model-aware duration/aspect/thinking choices, or video prompt QA before running a videoGenerate node.
 ---
 
 # VeoGenie Video Director
@@ -36,6 +36,7 @@ If the task should be grounded by a still image, fashion look, product hero, sto
 
 - Use `9:16` for short-form social/UGC unless the user says otherwise.
 - Prefer `omni-flash` for the most realistic video. Use Veo 3.1 models for normal video, fast drafts, or non-premium generation.
+- Use Gemini web video models only when the user explicitly wants the Gemini web flow. Pair them with `geminiThinkingLevel: "standard"` for simple/fast prompts or `"extended"` for complex/high-constraint prompts.
 - `Veo 3.1 - Lite/Fast/Quality` currently uses the app-side default duration because Flow may not show a duration selector.
 - `Omni Flash` can use explicit duration settings when Flow exposes them.
 - Do not change workflow wiring from this skill; route ports through `veogenie-workflow-designer`.

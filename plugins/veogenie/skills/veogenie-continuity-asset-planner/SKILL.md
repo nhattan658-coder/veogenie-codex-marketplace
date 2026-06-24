@@ -11,7 +11,7 @@ Use this skill before building or running multi-scene videos when the final clip
 
 - Use `veogenie-viral-video-producer` for hook, beat sheet, scene splitting, and natural dialogue.
 - Use `veogenie-workflow-designer` for node/edge recipes and explicit handles.
-- Use `veogenie-model-selector` for image model, video model, resolution, aspect ratio, and duration choices.
+- Use `veogenie-model-selector` for image model, video model, resolution, aspect ratio, duration, and Gemini web thinking-level choices.
 - Use `veogenie-image-to-video-input-planner` after the asset manifest is ready, so only necessary generated/supplied assets are connected to each video scene.
 - Use `veogenie-video-director` for final per-scene prompts after the continuity inputs are planned.
 - Use `veogenie-result-qa` after running pre-production assets or video clips.

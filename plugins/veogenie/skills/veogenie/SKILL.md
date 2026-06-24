@@ -30,7 +30,7 @@ description: Use when Codex needs to inspect or control a locally installed VeoG
 
 - Use `veogenie-workflow-designer` when creating or appending workflow recipes, choosing node types, or connecting text/image/video/voice ports. It contains the authoritative port contract for `frame-start`, `frame-end`, `video-reference-image`, `video-voice-reference`, and `videoMerge:video`.
 - Use `veogenie-ai-assistant-prompt-writer` when deciding whether Codex should write a final prompt directly or an `aiAssistant` / `Tro Ly AI` node should generate prompts dynamically inside the workflow.
-- Use `veogenie-model-selector` when choosing or updating model/provider/resolution/duration fields for `imageGenerate` or `videoGenerate` nodes.
+- Use `veogenie-model-selector` when choosing or updating model/provider/resolution/duration/geminiThinkingLevel fields for `imageGenerate` or `videoGenerate` nodes.
 - Use `veogenie-viral-video-producer` when creating hook-driven scripts, natural dialogue, multi-scene video plans, or several `videoGenerate` clips that form one short-form story.
 - Use `veogenie-continuity-asset-planner` before multi-scene videos when the agent must create or route missing characters, wardrobe, props/products, locations, style references, or shared voice inputs before video generation.
 - Use `veogenie-image-to-video-input-planner` when deciding whether to create a generated image before video and which minimal image/voice inputs should feed `videoGenerate` without redundant references.
@@ -109,7 +109,7 @@ For node/group runs, do not call `run_workflow_payload`; use `run_node` / `run_g
 - Do not treat `open_google_flow_login` as a successful Google login by itself; it only opens the managed browser. Report clearly if the user must finish login, 2FA, or captcha.
 - `build_product_ad_workflow_recipe` must stay plan-only: do not treat its output as a canvas write until the user explicitly asks to create/append the workflow and the canvas-write guard is enabled.
 - `plan_product_ad_job` must stay plan-only: execute only its returned guarded tool-call steps when the user asked for that action and the matching guard is enabled.
-- Use `update_workflow_nodes` only for schema-safe node fields such as title, prompt, model, aspect ratio, result count, duration, position, or voice metadata. It must not edit generated outputs/status, media raw/base64, run nonce, or automation internals.
+- Use `update_workflow_nodes` only for schema-safe node fields such as title, prompt, model, aspect ratio, result count, duration, geminiThinkingLevel, position, or voice metadata. It must not edit generated outputs/status, media raw/base64, run nonce, or automation internals.
 - Use `delete_workflow_nodes` only when the user asked to remove nodes from the active page. It deletes connected edges and group children, but not pages or media files.
 - Do not pass media URLs, base64, data URLs, or blob URLs through MCP.
 - For local media import, pass only a local file path and let the desktop app read the file.

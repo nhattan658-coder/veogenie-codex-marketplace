@@ -11,7 +11,7 @@ Use this skill when the user wants a complete short-form video concept, script, 
 
 - Use `veogenie` for MCP safety, permissions, run/poll, and result handoff.
 - Use `veogenie-workflow-designer` for node/edge recipes and explicit handles.
-- Use `veogenie-model-selector` for image/video model, duration, and resolution choices.
+- Use `veogenie-model-selector` for image/video model, duration, resolution, and Gemini web thinking-level choices.
 - Use `veogenie-continuity-asset-planner` before video nodes when a script uses multiple characters, recurring props/products, wardrobe, locations, style refs, or shared voice.
 - Use `veogenie-image-to-video-input-planner` when a scene should start from a generated still/storyboard/fashion/product image or when video inputs need pruning.
 - Use `veogenie-video-director` for final per-scene video prompt polish.

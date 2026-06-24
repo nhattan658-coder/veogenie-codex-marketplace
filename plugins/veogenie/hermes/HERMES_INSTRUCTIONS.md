@@ -78,6 +78,8 @@ Recommended routing:
 
 Before creating or editing a workflow, read `veogenie-workflow-designer/SKILL.md` and `references/node-port-contract.md`.
 
+Before choosing or changing an image/video model, read `veogenie-model-selector/SKILL.md`. For Gemini web video models (`gemini-3.1-flash-lite-video`, `gemini-3.5-flash-video`, `gemini-3.1-pro-video`), set `geminiThinkingLevel` to `standard` for simple/fast prompts and `extended` for complex, product-fidelity, or high-constraint prompts. Do not set `geminiThinkingLevel` on Google Flow/labs models.
+
 Before running or reporting results, read `veogenie/SKILL.md` and `veogenie-result-qa/SKILL.md`.
 
 ## Permission And Guard Rules

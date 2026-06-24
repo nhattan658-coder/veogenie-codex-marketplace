@@ -14,7 +14,7 @@ Before creating or appending a workflow:
 1. Use the base `veogenie` skill to read app state.
 2. Read `references/node-port-contract.md`.
 3. Use `veogenie-ai-assistant-prompt-writer` before adding `aiAssistant` / `Tro Ly AI` as a prompt-writing stage; Codex-direct prompt writing is the default unless the assistant stage has clear runtime value.
-4. Use `veogenie-model-selector` when setting `model`, `provider`, `width`, `height`, `aspectRatio`, or `duration` on output nodes.
+4. Use `veogenie-model-selector` when setting `model`, `provider`, `width`, `height`, `aspectRatio`, `duration`, or `geminiThinkingLevel` on output nodes.
 5. Use `veogenie-viral-video-producer` when the workflow represents a multi-scene short, viral script, or ordered set of video clips.
 6. Use `veogenie-continuity-asset-planner` when the workflow has multiple characters, generated cast members, recurring props/products, wardrobe, locations, or style references that must stay consistent across video scenes.
 7. Use `veogenie-image-to-video-input-planner` when deciding whether to create upstream `imageGenerate` anchors before `videoGenerate`, or when pruning redundant image references from video inputs.
@@ -53,7 +53,7 @@ For the current page:
 
 For existing nodes on the current page:
 
-1. Use `update_workflow_nodes` only for schema-safe node fields such as title, prompt, position, size, model, aspect ratio, result count, duration, and voice metadata.
+1. Use `update_workflow_nodes` only for schema-safe node fields such as title, prompt, position, size, model, aspect ratio, result count, duration, geminiThinkingLevel, and voice metadata.
 2. Use `delete_workflow_nodes` only when the user asked to remove nodes; it deletes connected edges and group children.
 3. Both tools require `canvas_write`, `confirmModifyCurrentPage=true`, and command-status polling.
 4. Do not use these tools to run automation, edit generated outputs/status, delete pages, delete media, or change node ids/types.

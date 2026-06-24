@@ -7,7 +7,7 @@ description: Create high-quality VeoGenie product advertising workflows, prompts
 
 ## Scope
 
-Use this skill for product-focused creative work. Pair it with the core `veogenie` skill for MCP safety, `veogenie-workflow-designer` when building or reviewing node structure, `veogenie-ai-assistant-prompt-writer` when deciding whether Codex or `Tro Ly AI` should write the prompt, `veogenie-model-selector` when choosing image/video models or resolution, `veogenie-image-to-video-input-planner` when a hero image should be generated before product/fashion video or when video inputs need pruning, `veogenie-continuity-asset-planner` when products/props/people/locations must stay consistent across scenes, and `veogenie-viral-video-producer` when the ad needs a hook-driven multi-scene script.
+Use this skill for product-focused creative work. Pair it with the core `veogenie` skill for MCP safety, `veogenie-workflow-designer` when building or reviewing node structure, `veogenie-ai-assistant-prompt-writer` when deciding whether Codex or `Tro Ly AI` should write the prompt, `veogenie-model-selector` when choosing image/video models, resolution, or Gemini web thinking level, `veogenie-image-to-video-input-planner` when a hero image should be generated before product/fashion video or when video inputs need pruning, `veogenie-continuity-asset-planner` when products/props/people/locations must stay consistent across scenes, and `veogenie-viral-video-producer` when the ad needs a hook-driven multi-scene script.
 
 ## Default Process
 

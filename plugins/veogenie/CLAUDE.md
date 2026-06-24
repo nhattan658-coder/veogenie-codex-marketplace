@@ -20,7 +20,7 @@ Follow `AGENTS.md` first. This file keeps the same guidance short for Claude-sty
 
 `open_google_flow_login` only opens the managed Chrome/Edge debug browser for Google Flow login. It does not run Google Flow automation or click Generate.
 
-Use `veogenie-model-selector` before choosing or updating model settings. Prefer GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, and Veo 3.1 models for normal video.
+Use `veogenie-model-selector` before choosing or updating model settings. Prefer GPT Image 2 for realistic images/storyboards, Nano Banana Pro or Nano Banana 2 at `2K`/`4K` for high-quality images, Omni Flash for the most realistic video, Veo 3.1 models for normal video, and Gemini web video models only when the user explicitly wants the Gemini web flow. For Gemini web video, set `geminiThinkingLevel` to `standard` for simple/fast prompts and `extended` for complex or high-constraint prompts. Do not set `geminiThinkingLevel` on Google Flow/labs models.
 
 Use `veogenie-ai-assistant-prompt-writer` to choose prompt-authoring mode. Prefer Codex-direct prompts; use `aiAssistant` / `Tro Ly AI` only when prompt generation must be dynamic, reusable, grounded by runtime inputs, produce selectable variants, or is explicitly requested inside the workflow. Verify assistant text before downstream generation.
 

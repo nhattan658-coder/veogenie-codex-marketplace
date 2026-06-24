@@ -70,4 +70,5 @@ Do not enable every guard by default on customer machines.
 - The Codex offline package is `veogenie-codex-marketplace-<version>.zip`.
 - The Hermes offline package is `veogenie-hermes-agent-<version>.zip`.
 - Generated media must be verified from VeoGenie app state through `get_node_outputs` and `get_media_album`.
+- Gemini web video models need `geminiThinkingLevel`: use `standard` for simple/fast prompts and `extended` for complex or high-constraint prompts.
 - `videoMerge` is supported for final merged videos, but only after two or more upstream video clips are complete.
